@@ -13,5 +13,15 @@
     "file": {
       "active": false
     }
+  },
+  "core": {
+    "url": "https://co2.pryv.li"
+  },
+  "sms": {
+    "endpoints": {
+      "send": "https://api.smsapi.com/mfa/codes",
+      "verify": "https://api.smsapi.com/mfa/codes/verifications"
+    },
+    "auth": "TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
   }
 }

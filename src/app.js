@@ -15,10 +15,11 @@ class Application {
 
   setupExpressApp(settings: Object): express$Application {
     const expressApp = express();
+    const cache = {};
 
     expressApp.use(express.json());
 
-    require('./routes/2fa')(expressApp, settings);
+    require('./routes/2fa')(expressApp, settings, cache);
 
     expressApp.use(middlewares.errors);
     
