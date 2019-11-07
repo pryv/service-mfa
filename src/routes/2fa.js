@@ -14,7 +14,7 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const phoneNumber = req.body.phone;
-        const id = await new SMSService(settings).send(phoneNumber);
+        const id = await new SMSService(settings).challenge(phoneNumber);
 
         res.status(302).send(id);
       } catch(err) {
@@ -85,7 +85,7 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
 
         const phoneNumber = profile.mfa.value;
 
-        const id = await new SMSService(settings).send(phoneNumber);
+        const id = await new SMSService(settings).challenge(phoneNumber);
 
         cache[id] = {
           username: pryvConnection.username,

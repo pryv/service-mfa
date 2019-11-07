@@ -25,7 +25,7 @@ class SMSService {
     return verification.ok;
   }
 
-  async send(phoneNumber: string): Promise<string> {
+  async challenge(phoneNumber: string): Promise<string> {
     const res = await request
       .post(this.endpointSend)
       .set('Authorization', `Bearer ${this.auth}`)

@@ -18,7 +18,7 @@ module.exports = (settings: Object, cache: Object, authMethod: string) => {
         await pryvConnection.login(req.body.password, req.body.appId);
         break;
       case 'pryvToken':
-        const pryvToken = req.header('Authorization') || req.query.auth[0];
+        const pryvToken = req.header('Authorization') || req.query.auth;
         pryvConnection = new PryvConnection(username, coreUrl, pryvToken);
         await pryvConnection.checkAccess();
         break;
