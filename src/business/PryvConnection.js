@@ -8,9 +8,9 @@ class PryvConnection {
   username: string;
   coreUrl: string;
 
-  constructor(username: string, coreUrl: string, token: ?string) {
+  constructor(settings: Object, username: string, token: ?string) {
     this.username = username;
-    this.coreUrl = coreUrl;
+    this.coreUrl = settings.get('core:url');
     this.token = token;
   }
 

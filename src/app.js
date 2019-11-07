@@ -18,6 +18,7 @@ class Application {
     const cache = {};
 
     expressApp.use(express.json());
+    expressApp.use(middlewares.subdomainToPath);
 
     require('./routes/2fa')(expressApp, settings, cache);
 

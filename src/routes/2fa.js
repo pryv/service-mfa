@@ -9,7 +9,7 @@ const SMSService = require('../business/SMSService');
 module.exports = function (expressApp: express$Application, settings: Object, cache: Object) {
 
   // POST /2fa/activate: activate 2fa
-  expressApp.post('/2fa/activate',
+  expressApp.post('/:username/2fa/activate',
     middlewares.authorization(settings, cache, 'pryvToken'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -24,7 +24,7 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
   );
 
     // POST /2fa/confirm: confirm 2fa activation
-  expressApp.post('/2fa/confirm',
+  expressApp.post('/:username/2fa/confirm',
     middlewares.authorization(settings, cache, 'pryvToken'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -51,7 +51,7 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
   );
 
   // POST /2fa/verify: verify 2fa
-  expressApp.post('/2fa/verify',
+  expressApp.post('/:username/2fa/verify',
     middlewares.authorization(settings, cache, 'mfaToken'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -72,7 +72,7 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
   );
 
   // POST /2fa/login: performs 2fa on top of a proxied Pryv login
-  expressApp.post('/2fa/login',
+  expressApp.post('/:username/2fa/login',
     middlewares.authorization(settings, cache, 'pryvCredentials'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
