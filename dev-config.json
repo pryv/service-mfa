@@ -23,5 +23,9 @@
       "verify": "https://api.smsapi.com/mfa/codes/verifications"
     },
     "auth": "TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
+  },
+  "cache": {
+    "ttl": 60,
+    "checkperiod": 60
   }
 }

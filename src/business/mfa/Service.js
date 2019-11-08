@@ -1,5 +1,6 @@
 // @flow
 
+const NodeCache = require('node-cache');
 const request = require('superagent');
 const Session = require('./Session');
 
@@ -11,13 +12,16 @@ class Service {
   auth: string;
   endpointChallenge: string;
   endpointVerify: string;
-  sessions: Map<string,Session>;
+  sessions: NodeCache;
 
   constructor(settings: Object) {
     this.auth = settings.get('sms:auth');
     this.endpointChallenge = settings.get('sms:endpoints:challenge');
     this.endpointVerify = settings.get('sms:endpoints:verify');
-    this.sessions = new Map();
+    this.sessions = new NodeCache({
+      stdTTL: settings.get('cache:ttl'),
+      checkperiod: settings.get('cache:checkperiod'),
+    });
   }
 
   async verify(phoneNumber: string, code: string): Promise<boolean> {
@@ -55,7 +59,7 @@ class Service {
   }
 
   clearSession(id: string): boolean {
-    return this.sessions.delete(id);
+    return this.sessions.del(id);
   }
 
 }
