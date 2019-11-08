@@ -1,8 +1,9 @@
 // @flow
 
 const request = require('superagent');
+const Profile = require('../mfa/Profile');
 
-class PryvConnection {
+class Connection {
 
   token: ?string;
   username: string;
@@ -22,20 +23,28 @@ class PryvConnection {
     this.token = res.body.token;
   }
 
-  async fetchProfile(): Promise<Object> {
+  async fetchProfile(): Promise<Profile> {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/profile/private`)
       .set('Authorization', this.token)
       .set('Origin', this.coreUrl);
-    return res.body.profile;
+    const pryvProfile = res.body.profile;
+    const mfaProfile = pryvProfile.mfa;
+    if (mfaProfile == null) return new Profile(null, null);
+    return new Profile(mfaProfile.id, mfaProfile.factor);
   }
 
-  async updateProfile(update: Object): Promise<void> {
+  async updateProfile(profile: Profile): Promise<void> {
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
       .set('Authorization', this.token)
       .set('Origin', this.coreUrl)
-      .send(update);
+      .send({
+        mfa: {
+          id: profile.id,
+          factor: profile.factor,
+        }
+      });
   }
 
   async checkAccess(): Promise<void> {
@@ -46,4 +55,4 @@ class PryvConnection {
   }
 }
 
-module.exports = PryvConnection;
+module.exports = Connection;

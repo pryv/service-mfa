@@ -3,43 +3,54 @@
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
 const request = require('superagent');
-const PryvConnection = require('../business/PryvConnection');
-const SMSService = require('../business/SMSService');
+const PryvConnection = require('../business/pryv/Connection');
+const MFAProfile = require('../business/mfa/Profile');
 
-module.exports = function (expressApp: express$Application, settings: Object, cache: Object) {
+import type MFAService from '../business/mfa/Service';
 
-  // POST /2fa/activate: activate 2fa
+module.exports = function (expressApp: express$Application, settings: Object, mfaService: MFAService) {
+
+  // POST /:username/2fa/activate: activate 2fa
   expressApp.post('/:username/2fa/activate',
-    middlewares.authorization(settings, cache, 'pryvToken'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const phoneNumber = req.body.phone;
-        const id = await new SMSService(settings).challenge(phoneNumber);
+        const username = req.params.username;
+        const pryvToken = req.header('Authorization') || req.query.auth;
+        const pryvConnection = new PryvConnection(settings, username, pryvToken);
+        await pryvConnection.checkAccess();
 
-        res.status(302).send(id);
+        const phoneNumber = req.body.value;
+        await mfaService.challenge(phoneNumber);
+
+        const mfaProfile = new MFAProfile('sms', phoneNumber);
+
+        const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
+
+        res.status(302).send(`MFA required: ${mfaToken}`);
       } catch(err) {
         next(err);
       }
     }
   );
 
-    // POST /2fa/confirm: confirm 2fa activation
+    // POST /:username/2fa/confirm: confirm 2fa activation
   expressApp.post('/:username/2fa/confirm',
-    middlewares.authorization(settings, cache, 'pryvToken'),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const code = req.body.code;
-        const phoneNumber = req.body.phone;
+        const mfaToken = req.header('Authorization') || req.query.auth;
+        const mfaSession = mfaService.getSession(mfaToken);
+        if (mfaSession == null) {
+          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
+        }
 
-        const valid = await new SMSService(settings).verify(phoneNumber, code);
+        const code = req.body.code;
+        const phoneNumber = mfaSession.profile.factor;
+
+        const valid = await mfaService.verify(phoneNumber, code);
 
         if (valid) {
-          req.context.pryvConnection.updateProfile({
-            mfa: {
-              method: 'sms',
-              value: phoneNumber,
-            }
-          })
+          mfaSession.connection.updateProfile(mfaSession.profile);
+          mfaService.clearSession(mfaSession.id);
           res.status(200).send('MFA activated.');
         } else {
           next(errorsFactory.unauthorized('Invalid MFA code.'));
@@ -50,17 +61,44 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
     }
   );
 
-  // POST /2fa/verify: verify 2fa
-  expressApp.post('/:username/2fa/verify',
-    middlewares.authorization(settings, cache, 'mfaToken'),
+  // POST /:username/2fa/challenge: performs 2fa challenge
+  expressApp.post('/:username/2fa/challenge',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const code = req.body.code;
-        const phoneNumber = req.body.phone;
+        const mfaToken = req.header('Authorization') || req.query.auth;
+        const mfaSession = mfaService.getSession(mfaToken);
+        if (mfaSession == null) {
+          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
+        }
 
-        const valid = await new SMSService(settings).verify(phoneNumber, code);
+        const phoneNumber = mfaSession.profile.factor;
+        await mfaService.challenge(phoneNumber);
+
+        res.status(200).send('Please verify MFA challenge.');
+      } catch (err) {
+        next(err);
+      }
+    }
+  );
+
+  // POST /:username/2fa/verify: verify 2fa
+  expressApp.post('/:username/2fa/verify',
+    async (req: express$Request, res: express$Response, next: express$NextFunction) => {
+      try {
+        const mfaToken = req.header('Authorization') || req.query.auth;
+        const mfaSession = mfaService.getSession(mfaToken);
+        if (mfaSession == null) {
+          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
+        }
+
+        const code = req.body.code;
+        const phoneNumber = mfaSession.profile.factor;
+        const pryvToken = mfaSession.connection.token;
+
+        const valid = await mfaService.verify(phoneNumber, code);
 
         if (valid) {
+          mfaService.clearSession(mfaSession.id);
           res.status(200).send({token: pryvToken});
         } else {
           next(errorsFactory.unauthorized('Invalid MFA code.'));
@@ -71,28 +109,22 @@ module.exports = function (expressApp: express$Application, settings: Object, ca
     }
   );
 
-  // POST /2fa/login: performs 2fa on top of a proxied Pryv login
-  expressApp.post('/:username/2fa/login',
-    middlewares.authorization(settings, cache, 'pryvCredentials'),
+  // POST /login: proxied Pryv login
+  expressApp.post('/:username/login',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const pryvConnection = req.context.pryvConnection;
-        const profile = await pryvConnection.fetchProfile();
+        const username = req.params.username;
+        const pryvConnection = new PryvConnection(settings, username, null);
+        await pryvConnection.login(req.body.password, req.body.appId);
+        const mfaProfile = await pryvConnection.fetchProfile();
 
-        if (profile.mfa == null || profile.mfa.method == null || profile.mfa.value == null) {
+        if (!mfaProfile.isActive()) {
           return res.status(200).send({token: pryvConnection.token});
         }
 
-        const phoneNumber = profile.mfa.value;
+        const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
-        const id = await new SMSService(settings).challenge(phoneNumber);
-
-        cache[id] = {
-          username: pryvConnection.username,
-          token: pryvConnection.token,
-        }
-
-        res.status(302).send(id);
+        res.status(302).send(`MFA required: ${mfaToken}`);
       } catch (err) {
         next(err);
       }

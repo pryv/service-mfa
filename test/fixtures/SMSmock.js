@@ -1,15 +1,38 @@
 // @flow
 
 const nock = require('nock');
-const settings = require('../../src/settings');
 
-module.exports = function (): void {
-  nock(settings.get('sms:url'))
-    .post('/verify')
+module.exports = function (settings: Object): void {
+
+  const endpointChallenge = settings.get('sms:endpoints:challenge');
+  const endpointVerify = settings.get('sms:endpoints:send');
+  const auth = settings.get('sms:auth');
+
+  nock(endpointChallenge)
+    .post('/')
     .reply(function () {
-      const auth = this.req.headers.authorization;
+      const authHeader = this.req.headers.authorization;
       let status, result;
-      if (auth != null) {
+      if (authHeader != auth) {
+        status = 200;
+        result = {
+          code: '1234',
+          id: '1234',
+        };
+      }
+      else {
+        status = 403;
+        result = 'Unauthorized.';
+      }
+      return [status, result];
+    });
+
+  nock(endpointVerify)
+    .post('/')
+    .reply(function () {
+      const authHeader = this.req.headers.authorization;
+      let status, result;
+      if (authHeader != null) {
         status = 200;
         result = 'OK';
       }

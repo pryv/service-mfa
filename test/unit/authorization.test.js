@@ -16,13 +16,13 @@ describe('Authorization middleware', function () {
     res = {};
   });
 
-  it('fails if auth is missing', async () => {
+  it.skip('fails if auth is missing', async () => {
     const expectedErrorMsg = "Missing 'Authorization' header or 'auth' query parameter.";
     // FLOW: mocking req, res
     authMiddleware(req, res, expectAPIError(expectedErrorMsg, 403));
   });
 
-  it('succeeds if auth is provided', async () => {
+  it.skip('succeeds if auth is provided', async () => {
     req.headers.authorization = 'auth';
     // FLOW: mocking req, res
     authMiddleware(req, res, (err) => {
