@@ -35,14 +35,10 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
     // POST /:username/2fa/confirm: confirm 2fa activation
   expressApp.post('/:username/2fa/confirm',
+    middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const mfaToken = req.header('Authorization') || req.query.auth;
-        const mfaSession = mfaService.getSession(mfaToken);
-        if (mfaSession == null) {
-          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
-        }
-
+        const mfaSession = req.context.session;
         const code = req.body.code;
         const phoneNumber = mfaSession.profile.factor;
 
@@ -63,14 +59,10 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/2fa/challenge: performs 2fa challenge
   expressApp.post('/:username/2fa/challenge',
+    middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const mfaToken = req.header('Authorization') || req.query.auth;
-        const mfaSession = mfaService.getSession(mfaToken);
-        if (mfaSession == null) {
-          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
-        }
-
+        const mfaSession = req.context.session;
         const phoneNumber = mfaSession.profile.factor;
         await mfaService.challenge(phoneNumber);
 
@@ -83,14 +75,10 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/2fa/verify: verify 2fa
   expressApp.post('/:username/2fa/verify',
+    middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const mfaToken = req.header('Authorization') || req.query.auth;
-        const mfaSession = mfaService.getSession(mfaToken);
-        if (mfaSession == null) {
-          return next(errorsFactory.unauthorized('Invalid MFA authorization token.'));
-        }
-
+        const mfaSession = req.context.session;
         const code = req.body.code;
         const phoneNumber = mfaSession.profile.factor;
         const pryvToken = mfaSession.connection.token;
