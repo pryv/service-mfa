@@ -58,4 +58,31 @@ describe('POST /mfa/activate', function () {
     assert.strictEqual(res.status, 302);
     assert.isDefined(res.body.mfaToken);
   });
+
+  describe('when the Pryv connection is invalid', function () {
+
+    let authReq, res;
+    before(async () => {
+      nock(coreEndpoint)
+        .get('/access-info')
+        .reply(function () {
+          authReq = this.req;
+          return [403, {
+            error: {
+              id: 'invalid-access-token',
+              message:'Cannot find access from token.'}}
+          ];
+        });
+      res = await request
+        .post(`/${username}/mfa/activate`)
+        .set('Authorization', pryvToken)
+        .send({
+          phone: mfaProfile.factor,
+        });
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 403);
+    });
+  });
 });

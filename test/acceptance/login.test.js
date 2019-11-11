@@ -23,7 +23,7 @@ describe('POST /mfa/login', function () {
     factor: '1234',
   };
 
-  describe('When MFA is not activated', function () {
+  describe('when MFA is not activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
@@ -61,7 +61,7 @@ describe('POST /mfa/login', function () {
     });
   });
 
-  describe('When MFA is activated', function () {
+  describe('when MFA is activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {

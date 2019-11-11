@@ -13,7 +13,13 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
   logger.debug('Error with message: ' + error.message, error);
   
   if (! (error instanceof ApiError)) {
-    error = errorsFactory.unexpectedError(error);
+    if (error.response != null && error.response.body != null && error.response.body.error != null) {
+      const errorBody = error.response.body.error;
+      const status = error.status || error.response.statusCode || error.response.status;
+      error = new ApiError(status, errorBody.message);
+    } else {
+      error = errorsFactory.unexpectedError(error);
+    }
   }
 
   res
