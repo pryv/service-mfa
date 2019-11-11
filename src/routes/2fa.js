@@ -2,7 +2,6 @@
 
 const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
-const request = require('superagent');
 const PryvConnection = require('../business/pryv/Connection');
 const MFAProfile = require('../business/mfa/Profile');
 
@@ -26,7 +25,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
-        res.status(302).send(mfaToken);
+        res.status(302).send({mfaToken: mfaToken});
       } catch(err) {
         next(err);
       }
@@ -112,7 +111,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
-        res.status(302).send(mfaToken);
+        res.status(302).send({mfaToken: mfaToken});
       } catch (err) {
         next(err);
       }

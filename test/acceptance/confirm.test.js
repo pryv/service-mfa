@@ -11,17 +11,22 @@ const nock = require('nock');
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
 
-const username = 'testuser';
-const coreEndpoint = `${settings.get('core:url')}/${username}`;
-const endpointVerify = settings.get('sms:endpoints:verify');
-
 describe('POST /:username/2fa/confirm', function () {
+  const username = 'testuser';
+  const coreEndpoint = `${settings.get('core:url')}/${username}`;
+  const endpointVerify = settings.get('sms:endpoints:verify');
+  const mfaCode = '5678';
+  const mfaProfile = {
+    id: 'sms',
+    factor: '1234',
+  };
+  const pryvToken = 'pryvToken';
 
-  let verifyReq, profileReq, mfaToken;
+  let verifyReq, profileReq, mfaToken, res;
   before(async () => {
-    const mfaProfile = new MFAProfile('sms', '1234');
-    const pryvConnection = new PryvConnection(settings, username, 'pryvToken');
-    mfaToken = app.mfaService.saveSession(mfaProfile, pryvConnection);
+    const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
+    const pryvConnection = new PryvConnection(settings, username, pryvToken);
+    mfaToken = app.mfaService.saveSession(profile, pryvConnection);
 
     nock(endpointVerify)
       .post('')
@@ -37,31 +42,31 @@ describe('POST /:username/2fa/confirm', function () {
         profileReq.body = requestBody;
         return [200, {}];
       });
-  });
-
-  it('confirms the activation of 2FA for current user', async () => {
-    const res = await request
+    res = await request
       .post(`/${username}/2fa/confirm`)
       .set('Authorization', mfaToken)
-      .send({
-        code: '5678',
-      });
+      .send({code: mfaCode});
+  });
 
+  it('verifies the MFA challenge', async () => {
     assert.isDefined(verifyReq);
-    assert.strictEqual(verifyReq.body['phone_number'], '1234');
-    assert.strictEqual(verifyReq.body['code'], '5678');
+    assert.strictEqual(verifyReq.body['phone_number'], mfaProfile.factor);
+    assert.strictEqual(verifyReq.body['code'], mfaCode);
     assert.strictEqual(verifyReq.headers['authorization'], `Bearer ${settings.get('sms:auth')}`);
+  });
 
+  it('updates the Pryv profile with the MFA parameters', async () => {
     assert.isDefined(profileReq);
-    assert.strictEqual(profileReq.headers['authorization'], 'pryvToken');
-    assert.deepEqual(profileReq.body.mfa, {
-      id: 'sms',
-      factor: '1234',
-    });
+    assert.strictEqual(profileReq.headers['authorization'], pryvToken);
+    assert.deepEqual(profileReq.body.mfa, mfaProfile);
+  });
 
+  it('clears the MFA session', async () => {
     const session = app.mfaService.getSession(mfaToken);
     assert.isUndefined(session);
+  });
 
+  it('answers 200 and confirms that MFA is activated', async () => {
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'MFA activated.');
   });

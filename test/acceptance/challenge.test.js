@@ -11,13 +11,12 @@ const nock = require('nock');
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
 
-const username = 'testuser';
-const endpointChallenge = settings.get('sms:endpoints:challenge');
-const apiKey = settings.get('sms:auth');
-
 describe('POST /:username/2fa/challenge', function () {
+  const username = 'testuser';
+  const endpointChallenge = settings.get('sms:endpoints:challenge');
+  const apiKey = settings.get('sms:auth');
 
-  let challengeReq, mfaToken;
+  let challengeReq, mfaToken, res;
   before(async () => {
     const mfaProfile = new MFAProfile('sms', '1234');
     const pryvConnection = new PryvConnection(settings, username, 'pryvToken');
@@ -30,18 +29,19 @@ describe('POST /:username/2fa/challenge', function () {
         challengeReq.body = requestBody;
         return [200, {}];
       });
-  });
-
-  it('performs the challenge', async () => {
-    const res = await request
+    res = await request
       .post(`/${username}/2fa/challenge`)
       .set('Authorization', mfaToken)
       .send({});
+  });
 
+  it('triggers the MFA challenge', async () => {
     assert.isDefined(challengeReq);
     assert.strictEqual(challengeReq.body.phone_number, '1234');
     assert.strictEqual(challengeReq.headers['authorization'], `Bearer ${apiKey}`);
+  });
 
+  it('answers 200 and asks to verify the MFA challenge', async () => {
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.text, 'Please verify MFA challenge.');
   });
