@@ -3,7 +3,7 @@
 const express = require('express');
 const middlewares = require('./middlewares');
 const nconfSettings = require('./settings');
-const MFAService = require('../business/mfa/Service');
+const MFAService = require('./business/mfa/Service');
 
 class Application {
   express: express$Application;
@@ -12,8 +12,8 @@ class Application {
 
   constructor() {
     this.settings = nconfSettings;
-    this.express = this.setupExpressApp();
     this.mfaService = new MFAService(this.settings);
+    this.express = this.setupExpressApp();
   }
 
   setupExpressApp(): express$Application {

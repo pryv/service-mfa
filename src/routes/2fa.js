@@ -19,14 +19,14 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
         await pryvConnection.checkAccess();
 
-        const phoneNumber = req.body.value;
+        const phoneNumber = req.body.phone;
         await mfaService.challenge(phoneNumber);
 
         const mfaProfile = new MFAProfile('sms', phoneNumber);
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
-        res.status(302).send(`MFA required: ${mfaToken}`);
+        res.status(302).send(mfaToken);
       } catch(err) {
         next(err);
       }
@@ -101,7 +101,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
   expressApp.post('/:username/login',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const username = req.params.username;
+        const username = req.body.username;
         const pryvConnection = new PryvConnection(settings, username, null);
         await pryvConnection.login(req.body.password, req.body.appId);
         const mfaProfile = await pryvConnection.fetchProfile();
@@ -112,7 +112,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
-        res.status(302).send(`MFA required: ${mfaToken}`);
+        res.status(302).send(mfaToken);
       } catch (err) {
         next(err);
       }
