@@ -5,6 +5,6 @@ ADD . /pd_build
 RUN /pd_build/install.sh
 
 # Ports:
-#   9000        service-2fa API
+#   9000        service-mfa API
 #
 EXPOSE 9000

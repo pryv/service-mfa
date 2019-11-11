@@ -9,8 +9,8 @@ import type MFAService from '../business/mfa/Service';
 
 module.exports = function (expressApp: express$Application, settings: Object, mfaService: MFAService) {
 
-  // POST /:username/2fa/activate: activate 2fa
-  expressApp.post('/:username/2fa/activate',
+  // POST /:username/mfa/activate: activate mfa
+  expressApp.post('/:username/mfa/activate',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const username = req.params.username;
@@ -32,8 +32,8 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     }
   );
 
-  // POST /:username/2fa/confirm: confirm 2fa activation
-  expressApp.post('/:username/2fa/confirm',
+  // POST /:username/mfa/confirm: confirm mfa activation
+  expressApp.post('/:username/mfa/confirm',
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -56,8 +56,8 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     }
   );
 
-  // POST /:username/2fa/challenge: performs 2fa challenge
-  expressApp.post('/:username/2fa/challenge',
+  // POST /:username/mfa/challenge: performs mfa challenge
+  expressApp.post('/:username/mfa/challenge',
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -72,8 +72,8 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     }
   );
 
-  // POST /:username/2fa/verify: verify 2fa
-  expressApp.post('/:username/2fa/verify',
+  // POST /:username/mfa/verify: verify mfa
+  expressApp.post('/:username/mfa/verify',
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -90,28 +90,6 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         } else {
           next(errorsFactory.unauthorized('Invalid MFA code.'));
         }
-      } catch (err) {
-        next(err);
-      }
-    }
-  );
-
-  // POST /login: proxied Pryv login
-  expressApp.post('/:username/login',
-    async (req: express$Request, res: express$Response, next: express$NextFunction) => {
-      try {
-        const username = req.body.username;
-        const pryvConnection = new PryvConnection(settings, username, null);
-        await pryvConnection.login(req.body.password, req.body.appId);
-        const mfaProfile = await pryvConnection.fetchProfile();
-
-        if (!mfaProfile.isActive()) {
-          return res.status(200).send({token: pryvConnection.token});
-        }
-
-        const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
-
-        res.status(302).send({mfaToken: mfaToken});
       } catch (err) {
         next(err);
       }

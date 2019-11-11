@@ -11,7 +11,7 @@ const nock = require('nock');
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
 
-describe('POST /:username/2fa/challenge', function () {
+describe('POST /mfa/challenge', function () {
   const username = 'testuser';
   const endpointChallenge = settings.get('sms:endpoints:challenge');
   const apiKey = settings.get('sms:auth');
@@ -30,7 +30,7 @@ describe('POST /:username/2fa/challenge', function () {
         return [200, {}];
       });
     res = await request
-      .post(`/${username}/2fa/challenge`)
+      .post(`/${username}/mfa/challenge`)
       .set('Authorization', mfaToken)
       .send({});
   });

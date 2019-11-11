@@ -26,11 +26,11 @@ run yarn release > /dev/null
 
 # Install the config file
 run mkdir -p $conf_dir && \
-  run cp /pd_build/config/service-2fa.json $conf_dir/
+  run cp /pd_build/config/service-mfa.json $conf_dir/
 
 # Create the log
 run mkdir -p $log_dir && \
-  run touch $log_dir/service-2fa.log && run chown -R app:app $log_dir
+  run touch $log_dir/service-mfa.log && run chown -R app:app $log_dir
 
 # Install the script that runs the api service
 run mkdir /etc/runit

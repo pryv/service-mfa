@@ -20,7 +20,7 @@ nconf.defaults({
     ip: '127.0.0.1',
   },
   logs: {
-    prefix: 'service-2fa',
+    prefix: 'service-mfa',
     console: {
       active: true,
       level: 'info',

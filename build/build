@@ -2,7 +2,7 @@
 
 set -e
 
-# Builds 'service-2fa' docker image with the version given below. 
+# Builds 'service-mfa' docker image with the version given below. 
 
 # Determine the build_tag and whether we need to release.
 scripts/build_name
@@ -40,9 +40,9 @@ tar cf build/release.tar \
   .
 popd
 
-echo "---------------------------- building service-2fa ------------------------------"
-pushd service-2fa
+echo "---------------------------- building service-mfa ------------------------------"
+pushd service-mfa
 cp ../release.tar .
-sudo docker build -f Dockerfile -t pryv/service-2fa:$version .
-release "pryv/service-2fa" $version
+sudo docker build -f Dockerfile -t pryv/service-mfa:$version .
+release "pryv/service-mfa" $version
 popd

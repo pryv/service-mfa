@@ -9,7 +9,7 @@ const request = require('supertest')(app.express);
 const settings = app.settings;
 const nock = require('nock');
 
-describe('POST /:username/2fa/login', function () {
+describe('POST /mfa/login', function () {
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const loginParams = {
@@ -23,7 +23,7 @@ describe('POST /:username/2fa/login', function () {
     factor: '1234',
   };
 
-  describe('When 2FA is not activated', function () {
+  describe('When MFA is not activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
@@ -61,7 +61,7 @@ describe('POST /:username/2fa/login', function () {
     });
   });
 
-  describe('When 2FA is activated', function () {
+  describe('When MFA is activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {

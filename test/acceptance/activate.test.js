@@ -9,7 +9,7 @@ const request = require('supertest')(app.express);
 const settings = app.settings;
 const nock = require('nock');
 
-describe('POST /:username/2fa/activate', function () {
+describe('POST /mfa/activate', function () {
 
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
@@ -36,7 +36,7 @@ describe('POST /:username/2fa/activate', function () {
         return [200, {}];
       });
     res = await request
-      .post(`/${username}/2fa/activate`)
+      .post(`/${username}/mfa/activate`)
       .set('Authorization', pryvToken)
       .send({
         phone: mfaProfile.factor,
@@ -50,7 +50,7 @@ describe('POST /:username/2fa/activate', function () {
 
   it('triggers the MFA challenge', async () => {
     assert.isDefined(challengeReq);
-    assert.strictEqual(challengeReq.body['phone_number'], '1234');
+    assert.strictEqual(challengeReq.body['phone_number'], mfaProfile.factor);
     assert.strictEqual(challengeReq.headers['authorization'], `Bearer ${settings.get('sms:auth')}`);
   });
 

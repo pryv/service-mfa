@@ -1,11 +1,11 @@
 // @flow
 
 const errors = require('./errors');
-const mfaSession = require('./mfaSession');
+const session = require('./session');
 const subdomainToPath = require('./subdomainToPath');
 
 module.exports = {
   errors: errors,
-  mfaSession: mfaSession,
+  mfaSession: session,
   subdomainToPath: subdomainToPath,
 };

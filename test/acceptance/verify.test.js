@@ -11,7 +11,7 @@ const nock = require('nock');
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
 
-describe('POST /:username/2fa/verify', function () {
+describe('POST /mfa/verify', function () {
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const endpointVerify = settings.get('sms:endpoints:verify');
@@ -43,7 +43,7 @@ describe('POST /:username/2fa/verify', function () {
         return [200, {}];
       });
     res = await request
-      .post(`/${username}/2fa/verify`)
+      .post(`/${username}/mfa/verify`)
       .set('Authorization', mfaToken)
       .send({
         code: mfaCode,

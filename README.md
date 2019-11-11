@@ -1,6 +1,6 @@
-# Service-2fa
+# Service-mfa
 
-A service for adding two factor authentication on top of Pryv.io login calls.
+A service for adding multi-factor authentication on top of Pryv.io login calls.
 
 Prerequisites: Node v8+, Yarn v1+
 
