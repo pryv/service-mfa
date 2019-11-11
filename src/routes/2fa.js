@@ -33,7 +33,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     }
   );
 
-    // POST /:username/2fa/confirm: confirm 2fa activation
+  // POST /:username/2fa/confirm: confirm 2fa activation
   expressApp.post('/:username/2fa/confirm',
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
