@@ -8,7 +8,8 @@ const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;
 const nock = require('nock');
-const Profile = require('../../src/business/mfa/Profile');
+const MFAProfile = require('../../src/business/mfa/Profile');
+const PryvConnection = require('../../src/business/pryv/Connection');
 
 const username = 'testuser';
 const endpointChallenge = settings.get('sms:endpoints:challenge');
@@ -18,8 +19,9 @@ describe('POST /:username/2fa/challenge', function () {
 
   let challengeReq, mfaToken;
   before(async () => {
-    const profile = new Profile('sms', '1234');
-    mfaToken = app.mfaService.saveSession(profile, null);
+    const mfaProfile = new MFAProfile('sms', '1234');
+    const pryvConnection = new PryvConnection(settings, username, 'pryvToken');
+    mfaToken = app.mfaService.saveSession(mfaProfile, pryvConnection);
 
     nock(endpointChallenge)
       .post('')
