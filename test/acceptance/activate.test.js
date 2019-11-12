@@ -7,14 +7,13 @@ const Application = require('../../src/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;
-const nock = require('nock');
+const AccessInfoMock = require('../fixture/AccessInfoMock');
+const ChallengeMock = require('../fixture/ChallengeMock');
 
 describe('POST /mfa/activate', function () {
 
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
-  const endpointChallenge = settings.get('sms:endpoints:challenge');
-  const pryvToken = 'pryvToken';
+  const pryvToken = 'validToken';
   const mfaProfile = {
     id: 'sms',
     factor: '1234',
@@ -22,19 +21,8 @@ describe('POST /mfa/activate', function () {
 
   let authReq, challengeReq, res;
   before(async () => {
-    nock(coreEndpoint)
-      .get('/access-info')
-      .reply(function () {
-        authReq = this.req;
-        return [200, {}];
-      });
-    nock(endpointChallenge)
-      .post('')
-      .reply(function (uri, requestBody) {
-        challengeReq = this.req;
-        challengeReq.body = requestBody;
-        return [200, {}];
-      });
+    new AccessInfoMock(settings, username, (req) => authReq = req);
+    new ChallengeMock(settings, (req) => challengeReq = req);
     res = await request
       .post(`/${username}/mfa/activate`)
       .set('Authorization', pryvToken)
@@ -61,21 +49,12 @@ describe('POST /mfa/activate', function () {
 
   describe('when the Pryv connection is invalid', function () {
 
-    let authReq, res;
+    let res;
     before(async () => {
-      nock(coreEndpoint)
-        .get('/access-info')
-        .reply(function () {
-          authReq = this.req;
-          return [403, {
-            error: {
-              id: 'invalid-access-token',
-              message:'Cannot find access from token.'}}
-          ];
-        });
+      new AccessInfoMock(settings, username);
       res = await request
         .post(`/${username}/mfa/activate`)
-        .set('Authorization', pryvToken)
+        .set('Authorization', 'invalidToken')
         .send({
           phone: mfaProfile.factor,
         });
@@ -83,6 +62,7 @@ describe('POST /mfa/activate', function () {
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.error.message, 'Cannot find access from token.');
     });
   });
 });

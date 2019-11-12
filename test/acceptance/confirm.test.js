@@ -7,14 +7,13 @@ const Application = require('../../src/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;
-const nock = require('nock');
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
+const VerfiyMock = require('../fixture/VerifyMock');
+const UpdateProfileMock = require('../fixture/UpdateProfileMock');
 
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
-  const endpointVerify = settings.get('sms:endpoints:verify');
   const mfaCode = '5678';
   const mfaProfile = {
     id: 'sms',
@@ -28,20 +27,8 @@ describe('POST /mfa/confirm', function () {
     const pryvConnection = new PryvConnection(settings, username, pryvToken);
     mfaToken = app.mfaService.saveSession(profile, pryvConnection);
 
-    nock(endpointVerify)
-      .post('')
-      .reply(function (uri, requestBody) {
-        verifyReq = this.req;
-        verifyReq.body = requestBody;
-        return [200, {}];
-      });
-    nock(coreEndpoint)
-      .put('/profile/private')
-      .reply(function (uri, requestBody) {
-        profileReq = this.req;
-        profileReq.body = requestBody;
-        return [200, {}];
-      });
+    new VerfiyMock(settings, username, (req) => verifyReq = req);
+    new UpdateProfileMock(settings, username, (req) => profileReq = req);
     res = await request
       .post(`/${username}/mfa/confirm`)
       .set('Authorization', mfaToken)

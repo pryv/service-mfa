@@ -5,13 +5,13 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const request = require('supertest')(app.express);
 const settings = app.settings;
-const nock = require('nock');
+const request = require('supertest')(app.express);
+const LoginMock = require('../fixture/LoginMock');
+const GetProfileMock = require('../fixture/GetProfileMock');
 
 describe('POST /mfa/login', function () {
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const loginParams = {
     username: 'testuser',
     password: 'testpassword',
@@ -27,19 +27,8 @@ describe('POST /mfa/login', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
-      nock(coreEndpoint)
-        .post('/auth/login')
-        .reply(function (uri, requestBody) {
-          loginReq = this.req;
-          loginReq.body = requestBody;
-          return [200, {token: pryvToken}];
-        });
-      nock(coreEndpoint)
-        .get('/profile/private')
-        .reply(function () {
-          profileReq = this.req;
-          return [200, {profile: {}}];
-        });
+      new LoginMock(settings, username, pryvToken, (req) => loginReq = req);
+      new GetProfileMock(settings, username, {}, (req) => profileReq = req);
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);
@@ -65,21 +54,8 @@ describe('POST /mfa/login', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
-      nock(coreEndpoint)
-        .post('/auth/login')
-        .reply(function (uri, requestBody) {
-          loginReq = this.req;
-          loginReq.body = requestBody;
-          return [200, {token: pryvToken}];
-        });
-      nock(coreEndpoint)
-        .get('/profile/private')
-        .reply(function () {
-          profileReq = this.req;
-          return [200, {
-            profile: {mfa: mfaProfile},
-          }];
-        });
+      new LoginMock(settings, username, pryvToken, (req) => loginReq = req);
+      new GetProfileMock(settings, username, mfaProfile, (req) => profileReq = req);
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);
