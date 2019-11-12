@@ -4,7 +4,7 @@ const nock = require('nock');
 
 class ChallengeMock {
 
-  constructor(settings: Object, cb: (Object) => void) {
+  constructor(settings: Object, cb?: (Object) => void) {
     nock(settings.get('sms:endpoints:challenge'))
       .post('')
       .reply(function (uri, requestBody) {

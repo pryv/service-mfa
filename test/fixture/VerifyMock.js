@@ -4,7 +4,7 @@ const nock = require('nock');
 
 class VerifyMock {
 
-  constructor(settings: Object, username: string, cb: (Object) => void) {
+  constructor(settings: Object, username: string, cb?: (Object) => void) {
     nock(settings.get('sms:endpoints:verify'))
       .post('')
       .reply(function (uri, requestBody) {

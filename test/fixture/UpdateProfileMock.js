@@ -4,7 +4,7 @@ const nock = require('nock');
 
 class UpdateProfileMock {
 
-  constructor(settings: Object, username: string, cb: (Object) => void) {
+  constructor(settings: Object, username: string, cb?: (Object) => void) {
     nock(`${settings.get('core:url')}/${username}`)
       .put('/profile/private')
       .reply(function (uri, requestBody) {

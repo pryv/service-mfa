@@ -4,7 +4,7 @@ const nock = require('nock');
 
 class AccessInfoMock {
 
-  constructor(settings: Object, username: string, cb: (Object) => void) {
+  constructor(settings: Object, username: string, cb?: (Object) => void) {
     nock(`${settings.get('core:url')}/${username}`)
       .get('/access-info')
       .reply(function () {

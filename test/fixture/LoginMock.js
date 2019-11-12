@@ -4,7 +4,7 @@ const nock = require('nock');
 
 class LoginMock {
 
-  constructor(settings: Object, username: string, pryvToken: string, cb: (Object) => void) {
+  constructor(settings: Object, username: string, pryvToken: string, cb?: (Object) => void) {
     nock(`${settings.get('core:url')}/${username}`)
       .post('/auth/login')
       .reply(function (uri, requestBody) {
