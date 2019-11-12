@@ -17,7 +17,7 @@ Prerequisites: Node v8+, Yarn v1+
 
 Here is a documented default configuration for this service: 
 
-```json
+```yml
   http: {
     port: 7000,
     ip: '127.0.0.1',
@@ -56,15 +56,15 @@ Here is a documented default configuration for this service:
 
 The proxied Pryv.io login call.
 
-Request body:
+`Request body`:
   - username
   - password
   - appId
 
-Request headers:
+`Request headers`:
   - 'Origin'?
 
-Response:
+`Response`:
   - if MFA activated: 302 {mfaToken: 'mfaToken'}
   - if MFA not activated: 200 {token, 'pryvPersonalToken'}
 
@@ -72,47 +72,47 @@ Response:
 
 Ask activation of MFA for current user.
 
-Request body:
+`Request body`:
   - phone: the phone number that will receive the challenge code by SMS
 
-Request headers:
+`Request headers`:
   - 'Authorization': Pryv.io personal token
 
-Response:
+`Response`:
   - 302 {mfaToken: 'mfaToken'}
 
 ### /:username/mfa/confirm
 
 Confirm activation of MFA for current user.
 
-Request body:
+`Request body`:
   - code: the challenge code to be verified
 
-Request headers:
+`Request headers`:
   - 'Authorization': mfaToken
 
-Response:
+`Response`:
   - 200 'MFA activated.'
 
 ### /:username/mfa/challenge
 
 Trigger the MFA challenge.
 
-Request headers:
+`Request headers`:
   - 'Authorization': mfaToken
 
-Response:
+`Response`:
   - 200 'Please verify MFA challenge.'
 
 ### /:username/mfa/verify
 
 Verify the MFA challenge.
 
-Request body:
+`Request body`:
   - code: the challenge code to be verified
 
-Request headers:
+`Request headers`:
   - 'Authorization': mfaToken
 
-Response:
+`Response`:
   - 200 {token: 'pryvPersonalToken'}
