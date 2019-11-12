@@ -10,7 +10,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
   expressApp.post('/:username/login',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
-        const username = req.body.username;
+        const username = req.params.username;
         const pryvConnection = new PryvConnection(settings, username, null);
         await pryvConnection.login(req.body.password, req.body.appId);
         const mfaProfile = await pryvConnection.fetchProfile();

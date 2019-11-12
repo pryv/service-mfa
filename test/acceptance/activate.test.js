@@ -10,7 +10,6 @@ const settings = app.settings;
 const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/activate', function () {
-
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const challengeEndpoint = settings.get('sms:endpoints:challenge');
@@ -49,24 +48,62 @@ describe('POST /mfa/activate', function () {
   });
 
   describe('when the Pryv connection is invalid', function () {
+    const pryvError = { error: {
+      id: 'invalid-access-token',
+      message: 'Cannot find access from token.'}
+    };
 
     let res;
     before(async () => {
-      new Mock(coreEndpoint, '/access-info', 'GET', 403, { error: {
-        id: 'invalid-access-token',
-        message:'Cannot find access from token.'}}
-      );
+      new Mock(coreEndpoint, '/access-info', 'GET', 403, pryvError);
       res = await request
         .post(`/${username}/mfa/activate`)
         .set('Authorization', 'invalidToken')
-        .send({
-          phone: mfaProfile.factor,
-        });
+        .send({phone: mfaProfile.factor});
     });
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 403);
-      assert.strictEqual(res.body.error.message, 'Cannot find access from token.');
+      assert.strictEqual(res.body.error.message, pryvError.error.message);
+    });
+  });
+
+  describe('when the MFA factor is missing', function () {
+
+    let res;
+    before(async () => {
+      new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken});
+      res = await request
+        .post(`/${username}/mfa/activate`)
+        .set('Authorization', pryvToken)
+        .send({});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.error.message, 'Missing parameter: phone.');
+    });
+  });
+
+  describe('when the MFA challenge fails', function () {
+    const serviceError = { error: {
+      id: 'unexpected',
+      message: 'Could not trigger the challenge.'}
+    };
+
+    let res;
+    before(async () => {
+      new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken}, (req) => authReq = req);
+      new Mock(challengeEndpoint, '', 'POST', 400, serviceError, (req) => challengeReq = req);
+      res = await request
+        .post(`/${username}/mfa/activate`)
+        .set('Authorization', pryvToken)
+        .send({phone: mfaProfile.factor});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.error.message, serviceError.error.message);
     });
   });
 });

@@ -13,7 +13,7 @@ describe('POST /mfa/login', function () {
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const loginParams = {
-    username: 'testuser',
+    username: username,
     password: 'testpassword',
     appId: 'pryv-test'
   };
@@ -87,6 +87,26 @@ describe('POST /mfa/login', function () {
       assert.deepEqual(profile, mfaProfile);
       assert.strictEqual(connection.username, username);
       assert.strictEqual(connection.token, pryvToken);
+    });
+  });
+
+  describe('when the Pryv connection is invalid', function () {
+    const pryvError = { error: {
+      id: 'invalid-credentials',
+      message: 'The given username/password pair is invalid.'}
+    };
+    
+    let res;
+    before(async () => {
+      new Mock(coreEndpoint, '/auth/login', 'POST', 401, pryvError);
+      res = await request
+        .post(`/${username}/login`)
+        .send({});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 401);
+      assert.strictEqual(res.body.error.message, pryvError.error.message);
     });
   });
 });

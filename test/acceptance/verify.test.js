@@ -52,4 +52,66 @@ describe('POST /mfa/verify', function () {
     assert.strictEqual(res.status, 200);
     assert.strictEqual(res.body.token, pryvToken);
   });
+
+  describe('when the MFA session token is invalid', function () {
+    const mfaCode = '5678';
+
+    let res;
+    before(async () => {
+
+      res = await request
+        .post(`/${username}/mfa/verify`)
+        .set('Authorization', 'invalidMfaToken')
+        .send({code: mfaCode});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 403);
+      assert.strictEqual(res.body.error.message, 'Invalid MFA session token.');
+    });
+  });
+
+  describe('when the MFA verification code is missing', function () {
+
+    let res, mfaToken;
+    before(async () => {
+      const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
+      const pryvConnection = new PryvConnection(settings, username, pryvToken);
+      mfaToken = app.mfaService.saveSession(profile, pryvConnection);
+
+      res = await request
+        .post(`/${username}/mfa/verify`)
+        .set('Authorization', mfaToken)
+        .send({});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 400);
+      assert.strictEqual(res.body.error.message, 'Missing parameter: code.');
+    });
+  });
+
+  describe('when the MFA verification fails', function () {
+    const serviceError = { error: {
+      id: 'invalid-code',
+      message: 'Invalid MFA code.'}
+    };
+
+    let res;
+    before(async () => {
+      const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
+      const pryvConnection = new PryvConnection(settings, username, pryvToken);
+      mfaToken = app.mfaService.saveSession(profile, pryvConnection);
+      new Mock(verifyEndpoint, '', 'POST', 404, serviceError);
+      res = await request
+        .post(`/${username}/mfa/verify`)
+        .set('Authorization', mfaToken)
+        .send({code: 'invalidCode'});
+    });
+
+    it('returns an error', async () => {
+      assert.strictEqual(res.status, 404);
+      assert.strictEqual(res.body.error.message, serviceError.error.message);
+    });
+  });
 });

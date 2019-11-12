@@ -19,6 +19,11 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         await pryvConnection.checkAccess();
 
         const phoneNumber = req.body.phone;
+
+        if (phoneNumber == null) {
+          return next(errorsFactory.missingParameter('phone'));
+        }
+
         await mfaService.challenge(phoneNumber);
 
         const mfaProfile = new MFAProfile('sms', phoneNumber);
@@ -38,18 +43,18 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        const code = req.body.code;
         const phoneNumber = mfaSession.profile.factor;
 
-        const valid = await mfaService.verify(phoneNumber, code);
-
-        if (valid) {
-          mfaSession.connection.updateProfile(mfaSession.profile);
-          mfaService.clearSession(mfaSession.id);
-          res.status(200).send('MFA activated.');
-        } else {
-          next(errorsFactory.unauthorized('Invalid MFA code.'));
+        const code = req.body.code;
+        if (code == null) {
+          return next(errorsFactory.missingParameter('code'));
         }
+
+        await mfaService.verify(phoneNumber, code);
+
+        mfaSession.connection.updateProfile(mfaSession.profile);
+        mfaService.clearSession(mfaSession.id);
+        res.status(200).send('MFA activated.');
       } catch(err) {
         next(err);
       }
@@ -78,18 +83,18 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        const code = req.body.code;
         const phoneNumber = mfaSession.profile.factor;
         const pryvToken = mfaSession.connection.token;
 
-        const valid = await mfaService.verify(phoneNumber, code);
-
-        if (valid) {
-          mfaService.clearSession(mfaSession.id);
-          res.status(200).send({token: pryvToken});
-        } else {
-          next(errorsFactory.unauthorized('Invalid MFA code.'));
+        const code = req.body.code;
+        if (code == null) {
+          return next(errorsFactory.missingParameter('code'));
         }
+
+        await mfaService.verify(phoneNumber, code);
+
+        mfaService.clearSession(mfaSession.id);
+        res.status(200).send({token: pryvToken});
       } catch (err) {
         next(err);
       }

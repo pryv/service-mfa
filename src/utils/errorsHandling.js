@@ -40,6 +40,11 @@ class ErrorsFactory {
     return new ApiError(400, msg);
   }
 
+  missingParameter(param: string) {
+    const msg = `Missing parameter: ${param}.`;
+    return new ApiError(400, msg);
+  }
+
   missingHeader (headerName: string): ApiError {
     const msg = `Missing expected header "${headerName}".`;
     return new ApiError(400, msg);

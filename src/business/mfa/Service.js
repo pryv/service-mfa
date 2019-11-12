@@ -24,15 +24,14 @@ class Service {
     });
   }
 
-  async verify(phoneNumber: string, code: string): Promise<boolean> {
-    const verification = await request
+  async verify(phoneNumber: string, code: string): Promise<void> {
+    await request
       .post(this.endpointVerify)
       .set('Authorization', `Bearer ${this.auth}`)
       .send({
         phone_number: phoneNumber,
         code: code,
       });
-    return verification.ok;
   }
 
   async challenge(phoneNumber: string): Promise<void> {
