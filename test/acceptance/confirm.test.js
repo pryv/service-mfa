@@ -9,11 +9,12 @@ const request = require('supertest')(app.express);
 const settings = app.settings;
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
-const VerfiyMock = require('../fixture/VerifyMock');
-const UpdateProfileMock = require('../fixture/UpdateProfileMock');
+const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
+  const verifyEndpoint = settings.get('sms:endpoints:verify');
+  const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const mfaCode = '5678';
   const mfaProfile = {
     id: 'sms',
@@ -27,8 +28,9 @@ describe('POST /mfa/confirm', function () {
     const pryvConnection = new PryvConnection(settings, username, pryvToken);
     mfaToken = app.mfaService.saveSession(profile, pryvConnection);
 
-    new VerfiyMock(settings, username, (req) => verifyReq = req);
-    new UpdateProfileMock(settings, username, (req) => profileReq = req);
+    new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => verifyReq = req);
+    new Mock(coreEndpoint, '/profile/private', 'PUT', 200, {}, (req) => profileReq = req);
+
     res = await request
       .post(`/${username}/mfa/confirm`)
       .set('Authorization', mfaToken)

@@ -9,9 +9,10 @@ const request = require('supertest')(app.express);
 const settings = app.settings;
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
-const VerfiyMock = require('../fixture/VerifyMock');
+const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/verify', function () {
+  const verifyEndpoint = settings.get('sms:endpoints:verify');
   const username = 'testuser';
   const pryvToken = 'pryvToken';
   const mfaCode = '5678';
@@ -26,7 +27,7 @@ describe('POST /mfa/verify', function () {
     const pryvConnection = new PryvConnection(settings, username, pryvToken);
     mfaToken = app.mfaService.saveSession(profile, pryvConnection);
 
-    new VerfiyMock(settings, username, (req) => verifyReq = req);
+    new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => verifyReq = req);
     res = await request
       .post(`/${username}/mfa/verify`)
       .set('Authorization', mfaToken)

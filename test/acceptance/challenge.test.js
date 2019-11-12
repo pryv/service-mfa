@@ -9,9 +9,10 @@ const request = require('supertest')(app.express);
 const settings = app.settings;
 const MFAProfile = require('../../src/business/mfa/Profile');
 const PryvConnection = require('../../src/business/pryv/Connection');
-const ChallengeMock = require('../fixture/ChallengeMock');
+const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/challenge', function () {
+  const challengeEndpoint = settings.get('sms:endpoints:challenge');
   const username = 'testuser';
   const apiKey = settings.get('sms:auth');
 
@@ -21,7 +22,7 @@ describe('POST /mfa/challenge', function () {
     const pryvConnection = new PryvConnection(settings, username, 'pryvToken');
     mfaToken = app.mfaService.saveSession(mfaProfile, pryvConnection);
 
-    new ChallengeMock(settings, (req) => challengeReq = req);
+    new Mock(challengeEndpoint, '', 'POST', 200, {}, (req) => challengeReq = req);
     res = await request
       .post(`/${username}/mfa/challenge`)
       .set('Authorization', mfaToken)

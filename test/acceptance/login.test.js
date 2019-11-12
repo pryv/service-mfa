@@ -7,11 +7,11 @@ const Application = require('../../src/app');
 const app = new Application();
 const settings = app.settings;
 const request = require('supertest')(app.express);
-const LoginMock = require('../fixture/LoginMock');
-const GetProfileMock = require('../fixture/GetProfileMock');
+const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/login', function () {
   const username = 'testuser';
+  const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const loginParams = {
     username: 'testuser',
     password: 'testpassword',
@@ -27,8 +27,9 @@ describe('POST /mfa/login', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
-      new LoginMock(settings, username, pryvToken, (req) => loginReq = req);
-      new GetProfileMock(settings, username, {}, (req) => profileReq = req);
+      new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken}, (req) => loginReq = req);
+      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {}}, (req) => profileReq = req);
+
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);
@@ -54,8 +55,8 @@ describe('POST /mfa/login', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
-      new LoginMock(settings, username, pryvToken, (req) => loginReq = req);
-      new GetProfileMock(settings, username, mfaProfile, (req) => profileReq = req);
+      new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken}, (req) => loginReq = req);
+      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {mfa: mfaProfile}}, (req) => profileReq = req);
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);

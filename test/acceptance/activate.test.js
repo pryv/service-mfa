@@ -7,12 +7,13 @@ const Application = require('../../src/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;
-const AccessInfoMock = require('../fixture/AccessInfoMock');
-const ChallengeMock = require('../fixture/ChallengeMock');
+const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/activate', function () {
 
   const username = 'testuser';
+  const coreEndpoint = `${settings.get('core:url')}/${username}`;
+  const challengeEndpoint = settings.get('sms:endpoints:challenge');
   const pryvToken = 'validToken';
   const mfaProfile = {
     id: 'sms',
@@ -21,8 +22,8 @@ describe('POST /mfa/activate', function () {
 
   let authReq, challengeReq, res;
   before(async () => {
-    new AccessInfoMock(settings, username, (req) => authReq = req);
-    new ChallengeMock(settings, (req) => challengeReq = req);
+    new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken}, (req) => authReq = req);
+    new Mock(challengeEndpoint, '', 'POST', 200, {}, (req) => challengeReq = req);
     res = await request
       .post(`/${username}/mfa/activate`)
       .set('Authorization', pryvToken)
@@ -51,7 +52,10 @@ describe('POST /mfa/activate', function () {
 
     let res;
     before(async () => {
-      new AccessInfoMock(settings, username);
+      new Mock(coreEndpoint, '/access-info', 'GET', 403, { error: {
+        id: 'invalid-access-token',
+        message:'Cannot find access from token.'}}
+      );
       res = await request
         .post(`/${username}/mfa/activate`)
         .set('Authorization', 'invalidToken')
