@@ -13,5 +13,18 @@
     "file": {
       "active": false
     }
+  },
+  "core": {
+    "url": "http://core:9000"
+  },
+  "sms": {
+    "endpoints": {
+      "challenge": "",
+      "verify": ""
+    },
+    "auth": ""
+  },
+  "sessions": {
+    "ttl": 60
   }
 }
