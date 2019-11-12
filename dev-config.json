@@ -24,8 +24,7 @@
     },
     "auth": "TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
   },
-  "cache": {
-    "ttl": 60,
-    "checkperiod": 60
+  "sessions": {
+    "ttl": 0.2
   }
 }
