@@ -50,3 +50,69 @@ Here is a documented default configuration for this service:
     ttl: 60 // Duration in seconds after which sessions are destroyed
   }
 ```
+## API routes
+
+### /:username/login
+
+The proxied Pryv.io login call.
+
+Request body:
+  - username
+  - password
+  - appId
+
+Request headers:
+  - 'Origin'?
+
+Response:
+  - if MFA activated: 302 {mfaToken: 'mfaToken'}
+  - if MFA not activated: 200 {token, 'pryvPersonalToken'}
+
+### /:username/mfa/activate
+
+Ask activation of MFA for current user.
+
+Request body:
+  - phone: the phone number that will receive the challenge code by SMS
+
+Request headers:
+  - 'Authorization': Pryv.io personal token
+
+Response:
+  - 302 {mfaToken: 'mfaToken'}
+
+### /:username/mfa/confirm
+
+Confirm activation of MFA for current user.
+
+Request body:
+  - code: the challenge code to be verified
+
+Request headers:
+  - 'Authorization': mfaToken
+
+Response:
+  - 200 'MFA activated.'
+
+### /:username/mfa/challenge
+
+Trigger the MFA challenge.
+
+Request headers:
+  - 'Authorization': mfaToken
+
+Response:
+  - 200 'Please verify MFA challenge.'
+
+### /:username/mfa/verify
+
+Verify the MFA challenge.
+
+Request body:
+  - code: the challenge code to be verified
+
+Request headers:
+  - 'Authorization': mfaToken
+
+Response:
+  - 200 {token: 'pryvPersonalToken'}
