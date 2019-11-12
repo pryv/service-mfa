@@ -93,8 +93,8 @@ describe('POST /mfa/activate', function () {
 
     let res;
     before(async () => {
-      new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken}, (req) => authReq = req);
-      new Mock(challengeEndpoint, '', 'POST', 400, serviceError, (req) => challengeReq = req);
+      new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken});
+      new Mock(challengeEndpoint, '', 'POST', 400, serviceError);
       res = await request
         .post(`/${username}/mfa/activate`)
         .set('Authorization', pryvToken)

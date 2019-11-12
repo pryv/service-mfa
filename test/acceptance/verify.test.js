@@ -7,30 +7,21 @@ const Application = require('../../src/app');
 const app = new Application();
 const request = require('supertest')(app.express);
 const settings = app.settings;
-const MFAProfile = require('../../src/business/mfa/Profile');
-const PryvConnection = require('../../src/business/pryv/Connection');
+const DummySession = require('../fixture/DummySession');
 const Mock = require('../fixture/Mock');
 
 describe('POST /mfa/verify', function () {
   const verifyEndpoint = settings.get('sms:endpoints:verify');
   const username = 'testuser';
-  const pryvToken = 'pryvToken';
   const mfaCode = '5678';
-  const mfaProfile = {
-    id: 'sms',
-    factor: '1234',
-  };
 
-  let verifyReq, mfaToken, res;
+  let verifyReq, res, session;
   before(async () => {
-    const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
-    const pryvConnection = new PryvConnection(settings, username, pryvToken);
-    mfaToken = app.mfaService.saveSession(profile, pryvConnection);
-
+    session = new DummySession(app, username);
     new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => verifyReq = req);
     res = await request
       .post(`/${username}/mfa/verify`)
-      .set('Authorization', mfaToken)
+      .set('Authorization', session.mfaToken)
       .send({
         code: mfaCode,
       });
@@ -38,24 +29,23 @@ describe('POST /mfa/verify', function () {
   
   it('verifies the MFA challenge', async () => {
     assert.isDefined(verifyReq);
-    assert.strictEqual(verifyReq.body['phone_number'], mfaProfile.factor);
+    assert.strictEqual(verifyReq.body['phone_number'], session.profile.factor);
     assert.strictEqual(verifyReq.body['code'], mfaCode);
     assert.strictEqual(verifyReq.headers['authorization'], `Bearer ${settings.get('sms:auth')}`);
   });
 
   it('clears the MFA session', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.body.token, pryvToken);
+    assert.strictEqual(res.body.token, session.connection.token);
   });
 
   it('answers 200 with the Pryv token', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.body.token, pryvToken);
+    assert.strictEqual(res.body.token, session.connection.token);
   });
 
   describe('when the MFA session token is invalid', function () {
-    const mfaCode = '5678';
-
+    
     let res;
     before(async () => {
 
@@ -73,12 +63,9 @@ describe('POST /mfa/verify', function () {
 
   describe('when the MFA verification code is missing', function () {
 
-    let res, mfaToken;
+    let res;
     before(async () => {
-      const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
-      const pryvConnection = new PryvConnection(settings, username, pryvToken);
-      mfaToken = app.mfaService.saveSession(profile, pryvConnection);
-
+      const mfaToken = new DummySession(app, username).mfaToken;
       res = await request
         .post(`/${username}/mfa/verify`)
         .set('Authorization', mfaToken)
@@ -99,9 +86,7 @@ describe('POST /mfa/verify', function () {
 
     let res;
     before(async () => {
-      const profile = new MFAProfile(mfaProfile.id, mfaProfile.factor);
-      const pryvConnection = new PryvConnection(settings, username, pryvToken);
-      mfaToken = app.mfaService.saveSession(profile, pryvConnection);
+      const mfaToken = new DummySession(app, username).mfaToken;
       new Mock(verifyEndpoint, '', 'POST', 404, serviceError);
       res = await request
         .post(`/${username}/mfa/verify`)
