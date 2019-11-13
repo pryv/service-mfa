@@ -3,6 +3,17 @@
 const request = require('superagent');
 const Profile = require('../mfa/Profile');
 
+type loginRequestBody = {
+  username: string,
+  password: string,
+  appId: string,
+};
+
+type loginRequestHeaders = {
+  origin: ?string,
+  referer: ?string,
+}
+
 class Connection {
 
   token: ?string;
@@ -15,11 +26,11 @@ class Connection {
     this.token = token;
   }
 
-  async login(password: string, appId: string): Promise<void> {
+  async login(requestBody: loginRequestBody, headers: Object): Promise<void> {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
-      .set('Origin', this.coreUrl)
-      .send({username: this.username, appId: appId, password: password});
+      .set(prepareHeaders(headers))
+      .send(requestBody);
     this.token = res.body.token;
   }
 
@@ -53,6 +64,17 @@ class Connection {
       .set('Authorization', this.token)
       .set('Origin', this.coreUrl);
   }
+}
+
+function prepareHeaders(headers: Object): loginRequestHeaders {
+  const allowed = ['origin', 'Origin', 'referer', 'Referer'];
+  const filtered = Object.keys(headers)
+    .filter(key => allowed.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = headers[key];
+      return obj;
+    }, {});
+  return filtered;
 }
 
 module.exports = Connection;

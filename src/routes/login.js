@@ -12,7 +12,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
       try {
         const username = req.params.username;
         const pryvConnection = new PryvConnection(settings, username, null);
-        await pryvConnection.login(req.body.password, req.body.appId);
+        await pryvConnection.login(req.body, req.headers);
         const mfaProfile = await pryvConnection.fetchProfile();
 
         if (!mfaProfile.isActive()) {

@@ -15,7 +15,10 @@ describe('POST /mfa/login', function () {
   const loginParams = {
     username: username,
     password: 'testpassword',
-    appId: 'pryv-test'
+    appId: 'pryv-test',
+  };
+  const loginHeaders = {
+    origin: coreEndpoint,
   };
   const pryvToken = 'pryvToken';
   const mfaProfile = {
@@ -32,12 +35,14 @@ describe('POST /mfa/login', function () {
 
       res = await request
         .post(`/${username}/login`)
+        .set(loginHeaders)
         .send(loginParams);
     });
 
     it('forwards the login call to Pryv', async () => {
       assert.isDefined(loginReq);
       assert.deepEqual(loginReq.body, loginParams);
+      assert.strictEqual(loginReq.headers.origin, loginHeaders.origin);
     });
 
     it('retrieves the Pryv private profile', async () => {
