@@ -8,7 +8,7 @@ module.exports = (req: express$Request, res: express$Response, next: express$Nex
   let authHeader = req.headers.authorization;
   const authQuery = req.query.auth;
 
-  if (authHeader == null && authQuery == null) {
+  if ((authHeader == null || authHeader === '') && (authQuery == null || authQuery === '')) {
     return next(errorsFactory.unauthorized("Missing 'Authorization' header or 'auth' query parameter."));
   }
 
