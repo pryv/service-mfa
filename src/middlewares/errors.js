@@ -1,7 +1,6 @@
 // @flow
 
 const errorsHandling = require('../utils/errorsHandling');
-const errorsFactory = errorsHandling.factory;
 const ApiError = errorsHandling.ApiError;
 const logging = require('../utils/logging');
 const logger = logging.getLogger('errors');
@@ -13,13 +12,23 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
   logger.debug('Error with message: ' + error.message, error);
   
   if (! (error instanceof ApiError)) {
-    if (error.response != null && error.response.body != null && error.response.body.error != null) {
-      const errorBody = error.response.body.error;
-      const status = error.status || error.response.statusCode || error.response.status;
-      error = new ApiError(status, errorBody.message);
-    } else {
-      error = errorsFactory.unexpectedError(error);
+    let message;
+
+    if (error.response != null && error.response.body != null) {
+      const errorBody = error.response.body;
+      if (errorBody.message != null) {
+        message = errorBody.message;
+      } else if (errorBody.error != null && errorBody.error.message != null) {
+        message = errorBody.error.message;
+      }
     }
+
+    if (message == null) {
+      message = error.toString();
+    }
+    
+    const status = error.status || error.response.statusCode || error.response.status;
+    error = new ApiError(status, message);
   }
 
   res
