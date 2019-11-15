@@ -18,9 +18,9 @@ describe('POST /mfa/activate', function () {
     phone: '1234'
   };
 
-  let authReq, challengeReq, res;
+  let accessInfoReq, challengeReq, res;
   before(async () => {
-    new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken}, (req) => authReq = req);
+    new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken}, (req) => accessInfoReq = req);
     new Mock(challengeEndpoint, '', 'POST', 200, {}, (req) => challengeReq = req);
     res = await request
       .post(`/${username}/mfa/activate`)
@@ -29,8 +29,8 @@ describe('POST /mfa/activate', function () {
   });
 
   it('checks the validity of the provided Pryv token', async () => {
-    assert.isDefined(authReq);
-    assert.strictEqual(authReq.headers['authorization'], pryvToken);
+    assert.isDefined(accessInfoReq);
+    assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
   });
 
   it('triggers the MFA challenge', async () => {
