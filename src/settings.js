@@ -44,7 +44,7 @@ nconf.defaults({
   },
   // Sessions are used to cache the state of MFA processes in progress
   sessions: {
-    ttl: 60 // Duration in seconds after which sessions are destroyed
+    ttlSeconds: 60 // Duration in seconds after which sessions are destroyed
   }
 });
 

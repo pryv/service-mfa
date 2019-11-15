@@ -25,6 +25,6 @@
     "auth": "Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
   },
   "sessions": {
-    "ttl": 0.2
+    "ttlSeconds": 0.2
   }
 }

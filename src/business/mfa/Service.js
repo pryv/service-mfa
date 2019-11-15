@@ -18,7 +18,7 @@ class Service {
     this.auth = settings.get('sms:auth');
     this.endpointChallenge = settings.get('sms:endpoints:challenge');
     this.endpointVerify = settings.get('sms:endpoints:verify');
-    this.sessionsTTL = settings.get('sessions:ttl') * 1000;
+    this.sessionsTTL = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
   }
 

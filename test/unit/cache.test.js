@@ -9,12 +9,12 @@ const settings = app.settings;
 const DummySession = require('../fixture/DummySession');
 
 describe('Cache for MFA sessions', function () {
-  const ttl = settings.get('sessions:ttl');
-  const maxTime = (ttl+0.1) * 1000;
-  this.timeout((ttl+0.2) * 1000);
+  const ttlSeconds = settings.get('sessions:ttlSeconds');
+  const maxTime = (ttlSeconds+0.1) * 1000;
+  this.timeout((ttlSeconds+0.2) * 1000);
   
   it('destroy the session after TTL', (done) => {
-    assert.strictEqual(app.mfaService.sessionsTTL, ttl*1000);
+    assert.strictEqual(app.mfaService.sessionsTTL, ttlSeconds*1000);
     const mfaToken = new DummySession(app, 'testuser').mfaToken;
     setTimeout(() => {
       assert.isUndefined(app.mfaService.getSession(mfaToken));
