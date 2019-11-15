@@ -21,9 +21,8 @@ describe('POST /mfa/login', function () {
     origin: coreEndpoint,
   };
   const pryvToken = 'pryvToken';
-  const mfaProfile = {
-    id: 'sms',
-    factor: '1234',
+  const profileContent = {
+    phone: '1234'
   };
 
   describe('when MFA is not activated', function () {
@@ -61,7 +60,7 @@ describe('POST /mfa/login', function () {
     let loginReq, profileReq, res;
     before(async () => {
       new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken}, (req) => loginReq = req);
-      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {mfa: mfaProfile}}, (req) => profileReq = req);
+      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {mfa: profileContent}}, (req) => profileReq = req);
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);
@@ -89,7 +88,7 @@ describe('POST /mfa/login', function () {
       const connection = session.connection;
       assert.isDefined(profile);
       assert.isDefined(connection);
-      assert.deepEqual(profile, mfaProfile);
+      assert.deepEqual(profile.content, profileContent);
       assert.strictEqual(connection.username, username);
       assert.strictEqual(connection.token, pryvToken);
     });

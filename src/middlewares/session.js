@@ -9,8 +9,7 @@ import type Service from '../business/mfa/Service';
 // 
 module.exports = (mfaService: Service) => {
   return async (req: express$Request, res: express$Response, next: express$NextFunction) => {
-    const mfaToken = req.header('Authorization') || req.query.auth;
-    const mfaSession = mfaService.getSession(mfaToken);
+    const mfaSession = mfaService.getSession(req.context.auth);
     if (mfaSession == null) {
       return next(errorsFactory.unauthorized('Invalid MFA session token.'));
     }

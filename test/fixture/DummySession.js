@@ -11,9 +11,8 @@ class DummySession {
   connection: PryvConnection;
   mfaToken: string;
 
-
   constructor(app: Application, username: string) {
-    this.profile = new MFAProfile('sms', '1234');
+    this.profile = new MFAProfile({phone: '1234'});
     this.connection = new PryvConnection(app.settings, username, 'pryvToken');
     this.mfaToken = app.mfaService.saveSession(this.profile, this.connection);
   }

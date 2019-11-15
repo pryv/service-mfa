@@ -13,7 +13,7 @@ const Mock = require('../fixture/Mock');
 describe('POST /mfa/verify', function () {
   const verifyEndpoint = settings.get('sms:endpoints:verify');
   const username = 'testuser';
-  const mfaCode = '5678';
+  const body = {code: '5678'};
 
   let verifyReq, res, session;
   before(async () => {
@@ -22,16 +22,13 @@ describe('POST /mfa/verify', function () {
     res = await request
       .post(`/${username}/mfa/verify`)
       .set('Authorization', session.mfaToken)
-      .send({
-        code: mfaCode,
-      });
+      .send(body);
   });
   
   it('verifies the MFA challenge', async () => {
     assert.isDefined(verifyReq);
-    assert.strictEqual(verifyReq.body['phone_number'], session.profile.factor);
-    assert.strictEqual(verifyReq.body['code'], mfaCode);
-    assert.strictEqual(verifyReq.headers['authorization'], `Bearer ${settings.get('sms:auth')}`);
+    assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content));
+    assert.strictEqual(verifyReq.headers['authorization'], settings.get('sms:auth'));
   });
 
   it('clears the MFA session', async () => {
@@ -45,36 +42,19 @@ describe('POST /mfa/verify', function () {
   });
 
   describe('when the MFA session token is invalid', function () {
-    
+
     let res;
     before(async () => {
 
       res = await request
         .post(`/${username}/mfa/verify`)
         .set('Authorization', 'invalidMfaToken')
-        .send({code: mfaCode});
+        .send(body);
     });
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 403);
       assert.strictEqual(res.body.error.message, 'Invalid MFA session token.');
-    });
-  });
-
-  describe('when the MFA verification code is missing', function () {
-
-    let res;
-    before(async () => {
-      const mfaToken = new DummySession(app, username).mfaToken;
-      res = await request
-        .post(`/${username}/mfa/verify`)
-        .set('Authorization', mfaToken)
-        .send({});
-    });
-
-    it('returns an error', async () => {
-      assert.strictEqual(res.status, 400);
-      assert.strictEqual(res.body.error.message, 'Missing parameter: code.');
     });
   });
 

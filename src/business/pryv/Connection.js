@@ -34,9 +34,7 @@ class Connection {
       .set('Authorization', this.token)
       .set('Origin', this.coreUrl);
     const pryvProfile = res.body.profile;
-    const mfaProfile = pryvProfile.mfa;
-    if (mfaProfile == null) return new Profile(null, null);
-    return new Profile(mfaProfile.id, mfaProfile.factor);
+    return new Profile(pryvProfile.mfa);
   }
 
   async updateProfile(profile: Profile): Promise<void> {
@@ -45,10 +43,7 @@ class Connection {
       .set('Authorization', this.token)
       .set('Origin', this.coreUrl)
       .send({
-        mfa: {
-          id: profile.id,
-          factor: profile.factor,
-        }
+        mfa: profile.content
       });
   }
 

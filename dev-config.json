@@ -22,7 +22,7 @@
       "challenge": "https://api.smsapi.com/mfa/codes",
       "verify": "https://api.smsapi.com/mfa/codes/verifications"
     },
-    "auth": "TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
+    "auth": "Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB"
   },
   "sessions": {
     "ttl": 0.2

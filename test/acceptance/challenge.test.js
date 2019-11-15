@@ -13,7 +13,7 @@ const Mock = require('../fixture/Mock');
 describe('POST /mfa/challenge', function () {
   const username = 'testuser';
   const challengeEndpoint = settings.get('sms:endpoints:challenge');
-  const apiKey = settings.get('sms:auth');
+  const auth = settings.get('sms:auth');
   
   let challengeReq, res, session;
   before(async () => {
@@ -27,8 +27,8 @@ describe('POST /mfa/challenge', function () {
 
   it('triggers the MFA challenge', async () => {
     assert.isDefined(challengeReq);
-    assert.strictEqual(challengeReq.body.phone_number, session.profile.factor);
-    assert.strictEqual(challengeReq.headers['authorization'], `Bearer ${apiKey}`);
+    assert.deepEqual(challengeReq.body, session.profile.content);
+    assert.strictEqual(challengeReq.headers['authorization'], auth);
   });
 
   it('answers 200 and asks to verify the MFA challenge', async () => {

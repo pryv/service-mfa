@@ -1,6 +1,5 @@
 // @flow
 
-const errorsFactory = require('../utils/errorsHandling').factory;
 const middlewares = require('../middlewares');
 const PryvConnection = require('../business/pryv/Connection');
 const MFAProfile = require('../business/mfa/Profile');
@@ -19,15 +18,9 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
         await pryvConnection.checkAccess();
 
-        const phoneNumber = req.body.phone;
+        const mfaProfile = new MFAProfile(req.body);
 
-        if (phoneNumber == null) {
-          return next(errorsFactory.missingParameter('phone'));
-        }
-
-        await mfaService.challenge(phoneNumber);
-
-        const mfaProfile = new MFAProfile('sms', phoneNumber);
+        await mfaService.challenge(mfaProfile, req);
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
@@ -45,14 +38,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        const phoneNumber = mfaSession.profile.factor;
-
-        const code = req.body.code;
-        if (code == null) {
-          return next(errorsFactory.missingParameter('code'));
-        }
-
-        await mfaService.verify(phoneNumber, code);
+        await mfaService.verify(mfaSession.profile, req);
 
         mfaSession.connection.updateProfile(mfaSession.profile);
         mfaService.clearSession(mfaSession.id);
@@ -70,8 +56,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        const phoneNumber = mfaSession.profile.factor;
-        await mfaService.challenge(phoneNumber);
+        await mfaService.challenge(mfaSession.profile, req);
 
         res.status(200).send('Please verify MFA challenge.');
       } catch (err) {
@@ -87,18 +72,10 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        const phoneNumber = mfaSession.profile.factor;
-        const pryvToken = mfaSession.connection.token;
-
-        const code = req.body.code;
-        if (code == null) {
-          return next(errorsFactory.missingParameter('code'));
-        }
-
-        await mfaService.verify(phoneNumber, code);
+        await mfaService.verify(mfaSession.profile, req);
 
         mfaService.clearSession(mfaSession.id);
-        res.status(200).send({token: pryvToken});
+        res.status(200).send({token: mfaSession.connection.token});
       } catch (err) {
         next(err);
       }

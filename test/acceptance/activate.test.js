@@ -14,9 +14,8 @@ describe('POST /mfa/activate', function () {
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const challengeEndpoint = settings.get('sms:endpoints:challenge');
   const pryvToken = 'validToken';
-  const mfaProfile = {
-    id: 'sms',
-    factor: '1234',
+  const profileContent = {
+    phone: '1234'
   };
 
   let authReq, challengeReq, res;
@@ -26,9 +25,7 @@ describe('POST /mfa/activate', function () {
     res = await request
       .post(`/${username}/mfa/activate`)
       .set('Authorization', pryvToken)
-      .send({
-        phone: mfaProfile.factor,
-      });
+      .send(profileContent);
   });
 
   it('checks the validity of the provided Pryv token', async () => {
@@ -38,8 +35,8 @@ describe('POST /mfa/activate', function () {
 
   it('triggers the MFA challenge', async () => {
     assert.isDefined(challengeReq);
-    assert.strictEqual(challengeReq.body['phone_number'], mfaProfile.factor);
-    assert.strictEqual(challengeReq.headers['authorization'], `Bearer ${settings.get('sms:auth')}`);
+    assert.deepEqual(challengeReq.body, profileContent);
+    assert.strictEqual(challengeReq.headers['authorization'], settings.get('sms:auth'));
   });
 
   it('answers 302 with a generated MFA session token', async () => {
@@ -59,29 +56,12 @@ describe('POST /mfa/activate', function () {
       res = await request
         .post(`/${username}/mfa/activate`)
         .set('Authorization', 'invalidToken')
-        .send({phone: mfaProfile.factor});
+        .send(profileContent);
     });
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 403);
       assert.strictEqual(res.body.error.message, pryvError.error.message);
-    });
-  });
-
-  describe('when the MFA factor is missing', function () {
-
-    let res;
-    before(async () => {
-      new Mock(coreEndpoint, '/access-info', 'GET', 200, {token: pryvToken});
-      res = await request
-        .post(`/${username}/mfa/activate`)
-        .set('Authorization', pryvToken)
-        .send({});
-    });
-
-    it('returns an error', async () => {
-      assert.strictEqual(res.status, 400);
-      assert.strictEqual(res.body.error.message, 'Missing parameter: phone.');
     });
   });
 
@@ -98,7 +78,7 @@ describe('POST /mfa/activate', function () {
       res = await request
         .post(`/${username}/mfa/activate`)
         .set('Authorization', pryvToken)
-        .send({phone: mfaProfile.factor});
+        .send(profileContent);
     });
 
     it('returns an error', async () => {

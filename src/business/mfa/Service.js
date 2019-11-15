@@ -22,23 +22,21 @@ class Service {
     this.sessions = new Map();
   }
 
-  async verify(phoneNumber: string, code: string): Promise<void> {
-    await request
-      .post(this.endpointVerify)
-      .set('Authorization', `Bearer ${this.auth}`)
-      .send({
-        phone_number: phoneNumber,
-        code: code,
-      });
-  }
-
-  async challenge(phoneNumber: string): Promise<void> {
+  async challenge(profile: Profile, req: express$Request): Promise<void> {
     await request
       .post(this.endpointChallenge)
-      .set('Authorization', `Bearer ${this.auth}`)
-      .send({
-        phone_number: phoneNumber
-      });
+      .set('Authorization', this.auth)
+      .query(req.query)
+      .send(profile.content);
+  }
+
+  async verify(profile: Profile, req: express$Request): Promise<void> {
+    const body = Object.assign({}, req.body, profile.content);
+    await request
+      .post(this.endpointVerify)
+      .set('Authorization', this.auth)
+      .query(req.query)
+      .send(body);
   }
 
   hasSession(id: string): boolean {

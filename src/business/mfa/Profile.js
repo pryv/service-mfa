@@ -2,16 +2,14 @@
 
 class Profile {
 
-  id: ?string;
-  factor: ?string;
+  content: ?mixed;
 
-  constructor(id: ?string, factor: ?string) {
-    this.id = id;
-    this.factor = factor;
+  constructor(content: ?mixed) {
+    this.content = content;
   }
 
   isActive() {
-    return this.id != null && this.factor != null;
+    return this.content != null;
   }
 }
 
