@@ -2,11 +2,8 @@
 
 const errors = require('../utils/errorsHandling').factory;
 
-// Middleware to translate the subdomain (i.e. username) in requests (if any) into the URL path,
-// e.g. path "/audit" on host ignace.pryv.io becomes "/ignace/audit".
-// Does not add the username again if it is already present as the path root.
-//
-// TODO: this responsibility could be moved out to the reverse proxy (e.g. Nginx)
+// Middleware to translate the subdomain (i.e. username) in requests (if any) into the URL path
+// See service-core/components/middleware/src/subdomainToPath.js for reference
 //
 module.exports = function (req: express$Request, res: express$Response, next: express$NextFunction) {
 
