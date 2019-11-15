@@ -11,10 +11,11 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/mfa/activate: activate mfa
   expressApp.post('/:username/mfa/activate',
+    middlewares.authorization,
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const username = req.params.username;
-        const pryvToken = req.header('Authorization') || req.query.auth;
+        const pryvToken = req.context.auth;
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
         await pryvConnection.checkAccess();
 
@@ -39,6 +40,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/mfa/confirm: confirm mfa activation
   expressApp.post('/:username/mfa/confirm',
+    middlewares.authorization,
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -63,6 +65,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/mfa/challenge: performs mfa challenge
   expressApp.post('/:username/mfa/challenge',
+    middlewares.authorization,
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
@@ -79,6 +82,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
   // POST /:username/mfa/verify: verify mfa
   expressApp.post('/:username/mfa/verify',
+    middlewares.authorization,
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {

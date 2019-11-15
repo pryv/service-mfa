@@ -3,12 +3,6 @@
 const request = require('superagent');
 const Profile = require('../mfa/Profile');
 
-type loginRequestBody = {
-  username: string,
-  password: string,
-  appId: string,
-};
-
 type loginRequestHeaders = {
   origin: ?string,
   referer: ?string,
@@ -26,7 +20,7 @@ class Connection {
     this.token = token;
   }
 
-  async login(requestBody: loginRequestBody, headers: Object): Promise<void> {
+  async login(requestBody: mixed, headers: mixed): Promise<void> {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
       .set(prepareHeaders(headers))
