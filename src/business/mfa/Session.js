@@ -2,18 +2,18 @@
 
 const uuidv1 = require('uuid/v1');
 
-import type Connection from '../pryv/Connection';
+import type PryvConnection from '../pryv/Connection';
 import type Profile from './Profile';
 
 class Session {
   id: string;
   profile: Profile;
-  connection: Connection;
+  pryvConnection: PryvConnection;
 
-  constructor(profile: Profile, connection: Connection) {
+  constructor(profile: Profile, pryvConnection: PryvConnection) {
     this.id = uuidv1();
     this.profile = profile;
-    this.connection = connection;
+    this.pryvConnection = pryvConnection;
   }
 }
 

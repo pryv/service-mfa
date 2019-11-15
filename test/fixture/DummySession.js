@@ -8,13 +8,13 @@ const PryvConnection = require('../../src/business/pryv/Connection');
 class DummySession {
 
   profile: MFAProfile;
-  connection: PryvConnection;
+  pryvConnection: PryvConnection;
   mfaToken: string;
 
   constructor(app: Application, username: string) {
     this.profile = new MFAProfile({phone: '1234'});
-    this.connection = new PryvConnection(app.settings, username, 'pryvToken');
-    this.mfaToken = app.mfaService.saveSession(this.profile, this.connection);
+    this.pryvConnection = new PryvConnection(app.settings, username, 'pryvToken');
+    this.mfaToken = app.mfaService.saveSession(this.profile, this.pryvConnection);
   }
 }
 

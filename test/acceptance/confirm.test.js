@@ -37,7 +37,7 @@ describe('POST /mfa/confirm', function () {
 
   it('updates the Pryv profile with the MFA parameters', async () => {
     assert.isDefined(profileReq);
-    assert.strictEqual(profileReq.headers['authorization'], session.connection.token);
+    assert.strictEqual(profileReq.headers['authorization'], session.pryvConnection.token);
     assert.deepEqual(profileReq.body.mfa, session.profile.content);
   });
 

@@ -3,7 +3,7 @@
 const request = require('superagent');
 const Session = require('./Session');
 
-import type Connection from '../pryv/Connection';
+import type PryvConnection from '../pryv/Connection';
 import type Profile from './Profile';
 
 class Service {
@@ -47,8 +47,8 @@ class Service {
     return this.sessions.get(id);
   }
 
-  saveSession(profile: Profile, connection: Connection): string {
-    const newSession = new Session(profile, connection);
+  saveSession(profile: Profile, pryvConnection: PryvConnection): string {
+    const newSession = new Session(profile, pryvConnection);
     this.sessions.set(newSession.id, newSession);
     setTimeout(() => {
       this.clearSession(newSession.id);

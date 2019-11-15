@@ -40,7 +40,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const mfaSession = req.context.session;
         await mfaService.verify(mfaSession.profile, req);
 
-        mfaSession.connection.updateProfile(mfaSession.profile);
+        mfaSession.pryvConnection.updateProfile(mfaSession.profile);
         mfaService.clearSession(mfaSession.id);
         res.status(200).send('MFA activated.');
       } catch(err) {
@@ -75,7 +75,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         await mfaService.verify(mfaSession.profile, req);
 
         mfaService.clearSession(mfaSession.id);
-        res.status(200).send({token: mfaSession.connection.token});
+        res.status(200).send({token: mfaSession.pryvConnection.token});
       } catch (err) {
         next(err);
       }

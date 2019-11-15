@@ -33,12 +33,12 @@ describe('POST /mfa/verify', function () {
 
   it('clears the MFA session', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.body.token, session.connection.token);
+    assert.strictEqual(res.body.token, session.pryvConnection.token);
   });
 
   it('answers 200 with the Pryv token', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.body.token, session.connection.token);
+    assert.strictEqual(res.body.token, session.pryvConnection.token);
   });
 
   describe('when the MFA session token is invalid', function () {

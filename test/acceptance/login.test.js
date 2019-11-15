@@ -85,12 +85,12 @@ describe('POST /mfa/login', function () {
       const session = app.mfaService.getSession(res.body.mfaToken);
       assert.isDefined(session);
       const profile = session.profile;
-      const connection = session.connection;
+      const pryvConnection = session.pryvConnection;
       assert.isDefined(profile);
-      assert.isDefined(connection);
+      assert.isDefined(pryvConnection);
       assert.deepEqual(profile.content, profileContent);
-      assert.strictEqual(connection.username, username);
-      assert.strictEqual(connection.token, pryvToken);
+      assert.strictEqual(pryvConnection.username, username);
+      assert.strictEqual(pryvConnection.token, pryvToken);
     });
   });
 
