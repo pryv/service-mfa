@@ -27,7 +27,12 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
       message = error.toString();
     }
     
-    const status = error.status || error.response.statusCode || error.response.status;
+    let status;
+    if (error.response != null) {
+      status = error.response.statusCode || error.response.status;
+    }
+    status = status || error.status;
+
     error = new ApiError(status, message);
   }
   const publicError = error.getPublicErrorData();
