@@ -47,7 +47,7 @@ Here is a documented default configuration for this service:
   },
   // Sessions are used to cache the state of MFA processes in progress
   sessions: {
-    ttlSeconds: 60 // Duration in seconds after which sessions are destroyed
+    ttlSeconds: 1800 // Duration in seconds after which sessions are destroyed
   }
 ```
 

@@ -32,7 +32,7 @@ nconf.defaults({
   },
   // Pryv.io core to which the login calls will be forwarded
   core: {
-    url: 'http://core:9000'
+    url: 'http://core_router:1337'
   },
   // API to send MFA challenge by SMS
   sms: {
@@ -40,11 +40,11 @@ nconf.defaults({
       challenge: '', // Endpoint that triggers the MFA challenge
       verify: '', // Endpoint that verifies the MFA challenge
     },
-    auth: '' // API key
+    auth: '' // API key, sent as 'Authorization' header
   },
   // Sessions are used to cache the state of MFA processes in progress
   sessions: {
-    ttlSeconds: 60 // Duration in seconds after which sessions are destroyed
+    ttlSeconds: 1800 // Duration in seconds after which sessions are destroyed
   }
 });
 
