@@ -30,8 +30,10 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
     const status = error.status || error.response.statusCode || error.response.status;
     error = new ApiError(status, message);
   }
-
+  const publicError = error.getPublicErrorData();
   res
     .status(error.httpStatus || 500)
-    .json({error: error.getPublicErrorData()});
+    .json({error: publicError});
+
+  logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:`, publicError);
 };

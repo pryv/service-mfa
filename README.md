@@ -67,7 +67,7 @@ The proxied Pryv.io login call.
 
 `Response`:
   - if MFA activated: 302 {mfaToken: 'mfaToken'}
-  - if MFA not activated: 200 {token, 'pryvPersonalToken'}
+  - if MFA not activated: 200 {token: 'pryvPersonalToken'}
 
 ### /:username/mfa/activate
 
