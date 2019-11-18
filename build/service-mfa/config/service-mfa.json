@@ -15,7 +15,7 @@
     }
   },
   "core": {
-    "url": "http://core:9000"
+    "url": "http://core_router:1337"
   },
   "sms": {
     "endpoints": {
