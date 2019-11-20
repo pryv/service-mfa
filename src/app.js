@@ -21,6 +21,7 @@ class Application {
 
     expressApp.use(express.json());
     expressApp.use(middlewares.subdomainToPath);
+    expressApp.use(middlewares.commonHeaders);
     
     require('./routes/login')(expressApp, this.settings, this.mfaService);
     require('./routes/mfa')(expressApp, this.settings, this.mfaService);
