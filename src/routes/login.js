@@ -13,8 +13,8 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
       try {
         const username = req.params.username;
         const pryvConnection = new PryvConnection(settings, username, null);
-        await pryvConnection.login(req.body, req.headers);
-        const mfaProfile = await pryvConnection.fetchProfile();
+        await pryvConnection.login(req);
+        const mfaProfile = await pryvConnection.fetchProfile(req);
 
         if (mfaProfile.isActive()) {
           const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);

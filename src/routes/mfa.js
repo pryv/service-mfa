@@ -17,7 +17,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const username = req.params.username;
         const pryvToken = req.context.auth;
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
-        await pryvConnection.checkAccess();
+        await pryvConnection.checkAccess(req);
 
         const mfaProfile = new MFAProfile(req.body);
 
@@ -42,7 +42,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const mfaSession = req.context.session;
         await mfaService.verify(mfaSession.profile, req);
 
-        mfaSession.pryvConnection.updateProfile(mfaSession.profile);
+        mfaSession.pryvConnection.updateProfile(req, mfaSession.profile);
         mfaService.clearSession(mfaSession.id);
         res.status(200).send('MFA activated.');
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);

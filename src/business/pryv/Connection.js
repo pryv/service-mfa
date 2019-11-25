@@ -3,11 +3,6 @@
 const request = require('superagent');
 const Profile = require('../mfa/Profile');
 
-type loginRequestHeaders = {
-  origin: ?string,
-  referer: ?string,
-}
-
 class Connection {
 
   token: ?string;
@@ -20,50 +15,39 @@ class Connection {
     this.token = token;
   }
 
-  async login(requestBody: mixed, headers: mixed): Promise<void> {
+  async login(req: express$Request): Promise<void> {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
-      .set(prepareHeaders(headers))
-      .send(requestBody);
+      .set(req.headers)
+      .send(req.body);
     this.token = res.body.token;
   }
 
-  async fetchProfile(): Promise<Profile> {
+  async fetchProfile(req: express$Request): Promise<Profile> {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/profile/private`)
-      .set('Authorization', this.token)
-      .set('Origin', this.coreUrl);
+      .set(req.headers)
+      .set('Authorization', this.token);
     const pryvProfile = res.body.profile;
     return new Profile(pryvProfile.mfa);
   }
 
-  async updateProfile(profile: Profile): Promise<void> {
+  async updateProfile(req: express$Request, profile: Profile): Promise<void> {
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
+      .set(req.headers)
       .set('Authorization', this.token)
-      .set('Origin', this.coreUrl)
       .send({
         mfa: profile.content
       });
   }
 
-  async checkAccess(): Promise<void> {
+  async checkAccess(req: express$Request): Promise<void> {
     await request
       .get(`${this.coreUrl}/${this.username}/access-info`)
-      .set('Authorization', this.token)
-      .set('Origin', this.coreUrl);
+      .set(req.headers)
+      .set('Authorization', this.token);
   }
-}
-
-function prepareHeaders(headers: Object): loginRequestHeaders {
-  const allowed = ['origin', 'Origin', 'referer', 'Referer'];
-  const filtered = Object.keys(headers)
-    .filter(key => allowed.includes(key))
-    .reduce((obj, key) => {
-      obj[key] = headers[key];
-      return obj;
-    }, {});
-  return filtered;
 }
 
 module.exports = Connection;
