@@ -18,7 +18,7 @@ class Connection {
   async login(req: express$Request): Promise<void> {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
-      .set(req.headers)
+      .set(allowedHeaders(req.headers))
       .send(req.body);
     this.token = res.body.token;
   }
@@ -26,7 +26,7 @@ class Connection {
   async fetchProfile(req: express$Request): Promise<Profile> {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/profile/private`)
-      .set(req.headers)
+      .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
     const pryvProfile = res.body.profile;
     return new Profile(pryvProfile.mfa);
@@ -35,7 +35,7 @@ class Connection {
   async updateProfile(req: express$Request, profile: Profile): Promise<void> {
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
-      .set(req.headers)
+      .set(allowedHeaders(req.headers))
       .set('Authorization', this.token)
       .send({
         mfa: profile.content
@@ -45,9 +45,20 @@ class Connection {
   async checkAccess(req: express$Request): Promise<void> {
     await request
       .get(`${this.coreUrl}/${this.username}/access-info`)
-      .set(req.headers)
+      .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
   }
+}
+
+function allowedHeaders(headers: Object): mixed {
+  const allowed = ['origin', 'Origin', 'referer', 'Referer', 'host', 'Host'];
+  const filtered = Object.keys(headers)
+    .filter(key => allowed.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = headers[key];
+      return obj;
+    }, {});
+  return filtered;
 }
 
 module.exports = Connection;
