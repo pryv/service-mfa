@@ -1,6 +1,6 @@
 {
   "name": "service-mfa",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A service for adding two factor authentication on top of Pryv.io login calls.",
   "main": "index.js",
   "author": "Thiébaud Modoux",
