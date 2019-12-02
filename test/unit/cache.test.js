@@ -14,7 +14,7 @@ describe('Cache for MFA sessions', function () {
   this.timeout((ttlSeconds+0.2) * 1000);
   
   it('destroy the session after TTL', (done) => {
-    assert.strictEqual(app.mfaService.sessionsTTL, ttlSeconds*1000);
+    assert.strictEqual(app.mfaService.ttlMilliseconds, ttlSeconds*1000);
     const mfaToken = new DummySession(app, 'testuser').mfaToken;
     setTimeout(() => {
       assert.isUndefined(app.mfaService.getSession(mfaToken));

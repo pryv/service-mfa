@@ -11,14 +11,14 @@ class Service {
   auth: string;
   endpointChallenge: string;
   endpointVerify: string;
-  sessionsTTL: number;
+  ttlMilliseconds: number;
   sessions: Map<string, Session>;
 
   constructor(settings: Object) {
     this.auth = settings.get('sms:auth');
     this.endpointChallenge = settings.get('sms:endpoints:challenge');
     this.endpointVerify = settings.get('sms:endpoints:verify');
-    this.sessionsTTL = settings.get('sessions:ttlSeconds') * 1000;
+    this.ttlMilliseconds = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
   }
 
@@ -52,7 +52,7 @@ class Service {
     this.sessions.set(newSession.id, newSession);
     setTimeout(() => {
       this.clearSession(newSession.id);
-    }, this.sessionsTTL);
+    }, this.ttlMilliseconds);
     return newSession.id;
   }
 
