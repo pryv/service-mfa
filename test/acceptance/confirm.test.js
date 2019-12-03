@@ -84,7 +84,7 @@ describe('POST /mfa/confirm', function () {
         .send({code: 'invalidCode'});
     });
 
-    it('returns an error', async () => {
+    it('returns the mfa service error', async () => {
       assert.strictEqual(res.status, 404);
       assert.strictEqual(res.body.error.message, serviceError.error.message);
     });
