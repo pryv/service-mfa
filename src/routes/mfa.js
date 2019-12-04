@@ -90,7 +90,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const mfaProfile = await pryvConnection.fetchProfile(req);
 
         if (!mfaProfile.getRecoveryCodes().includes(recoveryCode)) {
-          return next(errorsFactory.invalidParameter('Provided recovery code is invalid.'));
+          return next(errorsFactory.invalidParameter('Invalid recovery code.'));
         }
 
         // Reset the MFA profile

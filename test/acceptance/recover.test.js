@@ -87,7 +87,7 @@ describe('POST /mfa/recover', function () {
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 400);
-      assert.strictEqual(res.body.error.message, 'Provided recovery code is invalid.');
+      assert.strictEqual(res.body.error.message, 'Invalid recovery code.');
     });
   });
 
