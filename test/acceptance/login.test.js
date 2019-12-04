@@ -9,7 +9,7 @@ const settings = app.settings;
 const request = require('supertest')(app.express);
 const Mock = require('../fixture/Mock');
 
-describe('POST /mfa/login', function () {
+describe('POST /login', function () {
   const username = 'testuser';
   const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const loginParams = {
@@ -60,7 +60,7 @@ describe('POST /mfa/login', function () {
     let loginReq, profileReq, res;
     before(async () => {
       new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken}, (req) => loginReq = req);
-      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {mfa: profileContent}}, (req) => profileReq = req);
+      new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {mfa: {content: profileContent}}}, (req) => profileReq = req);
       res = await request
         .post(`/${username}/login`)
         .send(loginParams);

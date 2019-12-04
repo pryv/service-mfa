@@ -4,6 +4,7 @@ const middlewares = require('../middlewares');
 const PryvConnection = require('../business/pryv/Connection');
 const MFAProfile = require('../business/mfa/Profile');
 const logger = require('../utils/logging').getLogger('routes');
+const errorsFactory = require('../utils/errorsHandling').factory;
 
 import type MFAService from '../business/mfa/Service';
 
@@ -40,13 +41,63 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
         const mfaSession = req.context.session;
-        await mfaService.verify(mfaSession.profile, req);
+        const mfaProfile = mfaSession.profile;
+        await mfaService.verify(mfaProfile, req);
 
-        mfaSession.pryvConnection.updateProfile(req, mfaSession.profile);
+        mfaProfile.generateRecoveryCodes();
+        mfaSession.pryvConnection.updateProfile(req, mfaProfile);
         mfaService.clearSession(mfaSession.id);
         res.status(200).send('MFA activated.');
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch(err) {
+        next(err);
+      }
+    }
+  );
+
+  // POST /:username/mfa/deactivate: deactivate mfa using personal token
+  expressApp.post('/:username/mfa/deactivate',
+    middlewares.authorization,
+    async (req: express$Request, res: express$Response, next: express$NextFunction) => {
+      try {
+        const username = req.params.username;
+        const pryvToken = req.context.auth;
+        const pryvConnection = new PryvConnection(settings, username, pryvToken);
+
+        // Reset the MFA profile
+        await pryvConnection.updateProfile(req, null);
+        res.status(200).send('MFA deactivated.');
+        logger.info(`${req.method} ${req.url} ${res.statusCode}`);
+      } catch (err) {
+        next(err);
+      }
+    }
+  );
+
+  // POST /:username/mfa/recover: deactivate mfa using recovery code and username/password
+  expressApp.post('/:username/mfa/recover',
+    async (req: express$Request, res: express$Response, next: express$NextFunction) => {
+      try {
+        const recoveryCode = req.body.recoveryCode;
+        if (recoveryCode == null) {
+          return next(errorsFactory.missingParameter('recoveryCode'));
+        }
+        delete req.body.recoveryCode;
+
+        const username = req.params.username;
+        const pryvConnection = new PryvConnection(settings, username, null);
+        await pryvConnection.login(req);
+        const mfaProfile = await pryvConnection.fetchProfile(req);
+
+        if (!mfaProfile.getRecoveryCodes().includes(recoveryCode)) {
+          return next(errorsFactory.invalidParameter('Provided recovery code is invalid.'));
+        }
+
+        // Reset the MFA profile
+        await pryvConnection.updateProfile(req, null);
+        res.status(200).send('MFA deactivated.');
+        logger.info(`${req.method} ${req.url} ${res.statusCode}`);
+      } catch (err) {
         next(err);
       }
     }

@@ -38,7 +38,13 @@ describe('POST /mfa/confirm', function () {
   it('updates the Pryv profile with the MFA parameters', async () => {
     assert.isDefined(profileReq);
     assert.strictEqual(profileReq.headers['authorization'], session.pryvConnection.token);
-    assert.deepEqual(profileReq.body.mfa, session.profile.content);
+    assert.deepEqual(profileReq.body.mfa.content, session.profile.content);
+  });
+
+  it('generates and saves MFA backup codes', async () => {
+    assert.isTrue(Array.isArray(session.profile.recoveryCodes));
+    assert.strictEqual(session.profile.recoveryCodes.length, 10);
+    assert.deepEqual(profileReq.body.mfa.recoveryCodes, session.profile.recoveryCodes);
   });
 
   it('clears the MFA session', async () => {
