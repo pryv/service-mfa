@@ -66,7 +66,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         // Reset the MFA profile
         await pryvConnection.updateProfile(req, null);
-        res.status(200).send('MFA deactivated.');
+        res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
         next(err);
@@ -95,7 +95,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         // Reset the MFA profile
         await pryvConnection.updateProfile(req, null);
-        res.status(200).send('MFA deactivated.');
+        res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
         next(err);
@@ -112,7 +112,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const mfaSession = req.context.session;
         await mfaService.challenge(mfaSession.profile, req);
 
-        res.status(200).send('Please verify MFA challenge.');
+        res.status(200).send({ message: 'Please verify the MFA challenge.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
         next(err);
