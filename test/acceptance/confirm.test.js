@@ -52,9 +52,9 @@ describe('POST /mfa/confirm', function () {
     assert.isUndefined(retrievedSession);
   });
 
-  it('answers 200 and confirms that MFA is activated', async () => {
+  it('answers 200 and returns the MFA recovery codes', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'MFA activated.');
+    assert.deepEqual(res.body.recoveryCodes, session.profile.recoveryCodes);
   });
 
   describe('when the MFA session token is invalid', function () {

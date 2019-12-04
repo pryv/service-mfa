@@ -47,7 +47,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         mfaProfile.generateRecoveryCodes();
         mfaSession.pryvConnection.updateProfile(req, mfaProfile);
         mfaService.clearSession(mfaSession.id);
-        res.status(200).send('MFA activated.');
+        res.status(200).send({recoveryCodes: mfaProfile.getRecoveryCodes()});
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch(err) {
         next(err);
