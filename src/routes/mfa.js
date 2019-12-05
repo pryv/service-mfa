@@ -64,7 +64,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvToken = req.context.auth;
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
 
-        // Reset the MFA profile
+        // Clears the MFA profile
         await pryvConnection.updateProfile(req, null);
         res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
@@ -93,7 +93,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
           return next(errorsFactory.invalidParameter('Invalid recovery code.'));
         }
 
-        // Reset the MFA profile
+        // Clears the MFA profile
         await pryvConnection.updateProfile(req, null);
         res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
