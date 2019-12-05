@@ -14,11 +14,13 @@ module.exports = (req: express$Request, res: express$Response, next: express$Nex
 
   // Basic auth support
   // See service-core/components/middleware/src/initContext.js for reference
-  const authBasic = authHeader.split(' ');
-  if (authBasic[0].toLowerCase() === 'basic' && authBasic[1] != null) {
-    // Note: since our Basic scheme do not contain the username, the token is in first position
-    // example: https://token@username.pryv.me/
-    authHeader = Buffer.from(authBasic[1], 'base64').toString('ascii').split(':')[0];
+  if (authHeader != null) {
+    const authBasic = authHeader.split(' ');
+    if (authBasic[0].toLowerCase() === 'basic' && authBasic[1] != null) {
+      // Note: since our Basic scheme do not contain the username, the token is in first position
+      // example: https://token@username.pryv.me/
+      authHeader = Buffer.from(authBasic[1], 'base64').toString('ascii').split(':')[0];
+    }
   }
 
   // Set authorization token in the context
