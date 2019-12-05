@@ -25,7 +25,7 @@ describe('POST /mfa/deactivate', function () {
       .send();
   });
 
-  it('resets the Pryv MFA profile', async () => {
+  it('clears the MFA field in the Pryv profile', async () => {
     assert.isDefined(profileReq);
     assert.deepEqual(profileReq.body, {mfa: null});
     assert.strictEqual(profileReq.headers['authorization'], pryvToken);

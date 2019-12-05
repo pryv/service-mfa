@@ -47,7 +47,7 @@ describe('POST /mfa/recover', function () {
     assert.strictEqual(fetchProfileReq.headers['authorization'], pryvToken);
   });
 
-  it('resets the Pryv MFA profile', async () => {
+  it('clears the MFA field in the Pryv profile', async () => {
     assert.isDefined(updateProfileReq);
     assert.deepEqual(updateProfileReq.body, {mfa: null});
     assert.strictEqual(updateProfileReq.headers['authorization'], pryvToken);
