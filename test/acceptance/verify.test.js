@@ -25,7 +25,7 @@ describe('POST /mfa/verify', function () {
       .send(body);
   });
   
-  it('verifies the MFA challenge', async () => {
+  it('verifies the challenge by the MFA external service', async () => {
     assert.isDefined(verifyReq);
     assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content));
     assert.strictEqual(verifyReq.headers['authorization'], settings.get('sms:auth'));
@@ -74,7 +74,7 @@ describe('POST /mfa/verify', function () {
         .send({code: 'invalidCode'});
     });
 
-    it('returns an error', async () => {
+    it('returns the MFA external service error', async () => {
       assert.strictEqual(res.status, 404);
       assert.strictEqual(res.body.error.message, serviceError.error.message);
     });

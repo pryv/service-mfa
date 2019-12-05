@@ -52,7 +52,7 @@ describe('POST /mfa/challenge', function () {
     });
   });
 
-  describe('when the MFA challenge fails', function () {
+  describe('when the MFA challenge could not be triggered', function () {
     const serviceError = { error: {
       id: 'unexpected',
       message: 'Could not trigger the challenge.'}
@@ -68,7 +68,7 @@ describe('POST /mfa/challenge', function () {
         .send({});
     });
 
-    it('returns an error', async () => {
+    it('returns the MFA external service error', async () => {
       assert.strictEqual(res.status, 400);
       assert.strictEqual(res.body.error.message, serviceError.error.message);
     });

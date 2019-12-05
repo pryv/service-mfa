@@ -51,7 +51,7 @@ describe('POST /mfa/deactivate', function () {
         .send();
     });
 
-    it('returns an error', async () => {
+    it('returns the Pryv error', async () => {
       assert.strictEqual(res.status, 403);
       assert.strictEqual(res.body.error.message, pryvError.error.message);
     });

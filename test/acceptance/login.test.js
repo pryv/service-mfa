@@ -108,7 +108,7 @@ describe('POST /login', function () {
         .send({});
     });
 
-    it('returns an error', async () => {
+    it('returns the Pryv error', async () => {
       assert.strictEqual(res.status, 401);
       assert.strictEqual(res.body.error.message, pryvError.error.message);
     });
