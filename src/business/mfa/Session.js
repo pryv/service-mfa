@@ -1,6 +1,6 @@
 // @flow
 
-const uuidv1 = require('uuid/v1');
+const uuidv4 = require('uuid/v4');
 
 import type PryvConnection from '../pryv/Connection';
 import type Profile from './Profile';
@@ -11,7 +11,7 @@ class Session {
   pryvConnection: PryvConnection;
 
   constructor(profile: Profile, pryvConnection: PryvConnection) {
-    this.id = uuidv1();
+    this.id = uuidv4();
     this.profile = profile;
     this.pryvConnection = pryvConnection;
   }

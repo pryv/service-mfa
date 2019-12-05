@@ -29,17 +29,24 @@ class Connection {
       .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
     const pryvProfile = res.body.profile;
-    return new Profile(pryvProfile.mfa);
+    const mfaProfile = pryvProfile.mfa;
+    if (mfaProfile == null) return new Profile();
+    return new Profile(mfaProfile.content, mfaProfile.recoveryCodes);
   }
 
-  async updateProfile(req: express$Request, profile: Profile): Promise<void> {
+  async updateProfile(req: express$Request, profile: ?Profile): Promise<void> {
+    let update = null;
+    if (profile != null) {
+      update = {
+        content: profile.content,
+        recoveryCodes: profile.recoveryCodes,
+      };
+    }
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
       .set(allowedHeaders(req.headers))
       .set('Authorization', this.token)
-      .send({
-        mfa: profile.content
-      });
+      .send({mfa: update});
   }
 
   async checkAccess(req: express$Request): Promise<void> {

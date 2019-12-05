@@ -33,7 +33,7 @@ describe('POST /mfa/deactivate', function () {
 
   it('answers 200 and confirms that MFA is deactivated', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'MFA deactivated.');
+    assert.strictEqual(res.body.message, 'MFA deactivated.');
   });
 
   describe('when the Pryv connection is invalid', function () {

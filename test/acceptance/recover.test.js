@@ -55,7 +55,7 @@ describe('POST /mfa/recover', function () {
 
   it('answers 200 and confirms that MFA is deactivated', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'MFA deactivated.');
+    assert.strictEqual(res.body.message, 'MFA deactivated.');
   });
 
   describe('when the recovery code is missing', function () {
@@ -87,7 +87,7 @@ describe('POST /mfa/recover', function () {
 
     it('returns an error', async () => {
       assert.strictEqual(res.status, 400);
-      assert.strictEqual(res.body.error.message, 'Provided recovery code is invalid.');
+      assert.strictEqual(res.body.error.message, 'Invalid recovery code.');
     });
   });
 

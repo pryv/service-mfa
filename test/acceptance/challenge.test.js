@@ -33,7 +33,7 @@ describe('POST /mfa/challenge', function () {
 
   it('answers 200 and asks to verify the MFA challenge', async () => {
     assert.strictEqual(res.status, 200);
-    assert.strictEqual(res.text, 'Please verify MFA challenge.');
+    assert.strictEqual(res.body.message, 'Please verify the MFA challenge.');
   });
 
   describe('when the MFA session token is invalid', function () {
