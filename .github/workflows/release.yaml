@@ -15,4 +15,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build and deploy
-      run: ./build/build_workflow
+      run: ./build/build
