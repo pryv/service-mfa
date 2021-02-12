@@ -5,16 +5,23 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const request = require('supertest')(app.express);
-const settings = app.settings;
 const Mock = require('../fixture/Mock');
 const DummySession = require('../fixture/DummySession');
+const supertest = require('supertest');
 
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
-  const verifyEndpoint = settings.get('sms:endpoints:verify');
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
   const body = {code: '5678'};
+  let settings, coreEndpoint, verifyEndpoint, request;
+ 
+  before(async () => {
+    await app.init();
+    settings = app.settings;
+    coreEndpoint = `${settings.get('core:url')}/${username}`;
+    verifyEndpoint = settings.get('sms:endpoints:verify');
+    request = supertest(app.express);
+  });
+
 
   let verifyReq, profileReq, res, session;
   before(async () => {

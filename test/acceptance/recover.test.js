@@ -5,22 +5,29 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const request = require('supertest')(app.express);
-const settings = app.settings;
 const Mock = require('../fixture/Mock');
+const supertest = require('supertest');
 
 describe('POST /mfa/recover', function () {
+  let settings, coreEndpoint, request, loginHeaders;
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
+ 
+  before(async () => {
+    await app.init();
+    settings = app.settings;
+    coreEndpoint = `${settings.get('core:url')}/${username}`;
+    request = supertest(app.express);
+    loginHeaders = {
+      origin: coreEndpoint,
+    };
+  });
+
   const pryvToken = 'validToken';
   const recoveryCode = 'validCode';
   const loginParams = {
     username: username,
     password: 'testpassword',
     appId: 'pryv-test',
-  };
-  const loginHeaders = {
-    origin: coreEndpoint,
   };
 
   let loginReq, fetchProfileReq, updateProfileReq, res;

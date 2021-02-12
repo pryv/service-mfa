@@ -1,8 +1,13 @@
 // @flow
+const path = require('path');
+const { getConfig } = require('@pryv/boiler').init({
+  appName: 'service-mfa',
+  baseConfigDir: path.resolve(__dirname, '../config/')
+});
+
 
 const express = require('express');
 const middlewares = require('./middlewares');
-const nconfSettings = require('./settings');
 const MFAService = require('./business/mfa/Service');
 
 class Application {
@@ -11,9 +16,14 @@ class Application {
   mfaService: MFAService;
 
   constructor() {
-    this.settings = nconfSettings;
+
+  }
+
+  async init() {
+    this.settings = await getConfig();
     this.mfaService = new MFAService(this.settings);
     this.express = this.setupExpressApp();
+    return this;
   }
 
   setupExpressApp(): express$Application {

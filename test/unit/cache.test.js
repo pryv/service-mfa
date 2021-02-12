@@ -5,13 +5,19 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const settings = app.settings;
 const DummySession = require('../fixture/DummySession');
 
 describe('Cache for MFA sessions', function () {
-  const ttlSeconds = settings.get('sessions:ttlSeconds');
-  const maxTime = (ttlSeconds+0.1) * 1000;
-  this.timeout((ttlSeconds+0.2) * 1000);
+  let ttlSeconds, maxTime; 
+
+  before(async function () {
+    await app.init();
+    settings = app.settings;
+    ttlSeconds = settings.get('sessions:ttlSeconds');
+    maxTime = (ttlSeconds+0.1) * 1000;
+    this.timeout((ttlSeconds+0.2) * 1000);
+  });
+
   
   it('destroy the session after TTL', (done) => {
     assert.strictEqual(app.mfaService.ttlMilliseconds, ttlSeconds*1000);

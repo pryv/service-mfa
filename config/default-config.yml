@@ -1,0 +1,13 @@
+---
+http:
+  port: 7000
+  ip: 127.0.0.1
+core:
+  url: http://core_router:1337
+sms:
+  endpoints:
+    challenge: ''
+    verify: ''
+  auth: ''
+sessions:
+  ttlSeconds: 1800

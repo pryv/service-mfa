@@ -1,7 +1,7 @@
 // @flow
 
 const PryvConnection = require('../business/pryv/Connection');
-const logger = require('../utils/logging').getLogger('routes');
+const logger = require('@pryv/boiler').getLogger('routes');
 
 import type MFAService from '../business/mfa/Service';
 
@@ -18,9 +18,13 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         if (mfaProfile.isActive()) {
           const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
-          res.status(302).send({mfaToken: mfaToken});
+          res.status(302).send({mfaToken: mfaToken, meta: pryvConnection.meta});
         } else {
-          res.status(200).send({token: pryvConnection.token});
+          res.status(200).send({
+            token: pryvConnection.token, 
+            apiEndpoint: pryvConnection.apiEndpoint,
+            meta: pryvConnection.meta
+          });
         }
 
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);

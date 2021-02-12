@@ -2,8 +2,7 @@
 
 const errorsHandling = require('../utils/errorsHandling');
 const ApiError = errorsHandling.ApiError;
-const logging = require('../utils/logging');
-const logger = logging.getLogger('errors');
+const logger = require('@pryv/boiler').getLogger('errors');
 
 // Error middleware.
 // NOTE: next is not used, since the request is terminated on all errors. 

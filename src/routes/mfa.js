@@ -3,7 +3,7 @@
 const middlewares = require('../middlewares');
 const PryvConnection = require('../business/pryv/Connection');
 const MFAProfile = require('../business/mfa/Profile');
-const logger = require('../utils/logging').getLogger('routes');
+const logger = require('@pryv/boiler').getLogger('routes');
 const errorsFactory = require('../utils/errorsHandling').factory;
 
 import type MFAService from '../business/mfa/Service';

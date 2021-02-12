@@ -5,31 +5,38 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const settings = app.settings;
-const request = require('supertest')(app.express);
 const Mock = require('../fixture/Mock');
+const supertest = require('supertest');
 
 describe('POST /login', function () {
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
+  let settings, coreEndpoint, request, loginHeaders;
+
+  before(async () => {
+    await app.init();
+    settings = app.settings;
+    coreEndpoint = `${settings.get('core:url')}/${username}`;
+    request = supertest(app.express);
+    loginHeaders = {
+      origin: coreEndpoint,
+    };
+  });
+
   const loginParams = {
     username: username,
     password: 'testpassword',
     appId: 'pryv-test',
-  };
-  const loginHeaders = {
-    origin: coreEndpoint,
   };
   const pryvToken = 'pryvToken';
   const profileContent = {
     phone: '1234'
   };
 
-  describe('when MFA is not activated', function () {
+  describe('XXXX when MFA is not activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
-      new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken}, (req) => loginReq = req);
+      new Mock(coreEndpoint, '/auth/login', 'POST', 200, {token: pryvToken, apiEndpoint: 'http://' + pryvToken + '@dummy/dummy', meta: { serial: '00000'}}, (req) => loginReq = req);
       new Mock(coreEndpoint, '/profile/private', 'GET', 200, {profile: {}}, (req) => profileReq = req);
 
       res = await request
@@ -52,6 +59,8 @@ describe('POST /login', function () {
     it('simply returns the Pryv token', async () => {
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.token, pryvToken);
+      assert.strictEqual(res.body.apiEndpoint, 'http://' + pryvToken + '@dummy/dummy');
+      assert.exists(res.body.meta);
     });
   });
 

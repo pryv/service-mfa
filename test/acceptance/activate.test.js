@@ -5,18 +5,24 @@
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
-const request = require('supertest')(app.express);
-const settings = app.settings;
 const Mock = require('../fixture/Mock');
+const supertest = require('supertest');
 
 describe('POST /mfa/activate', function () {
+  let settings, coreEndpoint, challengeEndpoint, request;
   const username = 'testuser';
-  const coreEndpoint = `${settings.get('core:url')}/${username}`;
-  const challengeEndpoint = settings.get('sms:endpoints:challenge');
   const pryvToken = 'validToken';
   const profileContent = {
     phone: '1234'
   };
+
+  before(async () => {
+    await app.init();
+    settings = app.settings;
+    coreEndpoint = `${settings.get('core:url')}/${username}`;
+    challengeEndpoint = settings.get('sms:endpoints:challenge');
+    request = supertest(app.express);
+  });
 
   let accessInfoReq, challengeReq, res;
   before(async () => {
