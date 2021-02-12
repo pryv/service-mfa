@@ -5,16 +5,13 @@ set -e
 # Builds 'service-mfa' docker image with the version given below. 
 
 # Determine the build_tag and whether we need to release.
-scripts/build_name
+SCRIPT_FOLDER=$(cd $(dirname "$0"); pwd)
+$SCRIPT_FOLDER/scripts/build_name
 
 version=$(cat build_tag)
 if [ -e release_build ]; then
   echo "This is a release build, it will update 'latest' tags."
 fi
-
-# Copy the release version to the project root, so we can later display it to
-# clients:
-cp ./build_tag ../.api-version
 
 function release {
   local host='eu.gcr.io'
