@@ -8,15 +8,13 @@ class Connection {
   token: ?string;
   username: string;
   coreUrl: string;
-  apiEndpoint: ?string;
-  meta: ?object;
+  content: ?object;
 
-  constructor(settings: Object, username: string, token: ?string, apiEndpoint: ?string, meta: ?object) {
+  constructor(settings: Object, username: string, token: ?string) {
     this.username = username;
     this.coreUrl = settings.get('core:url');
     this.token = token;
-    this.apiEndpoint = apiEndpoint;
-    this.meta = meta;
+    this.content = null;
   }
 
   async login(req: express$Request): Promise<void> {
@@ -25,8 +23,7 @@ class Connection {
       .set(allowedHeaders(req.headers))
       .send(req.body);
     this.token = res.body.token;
-    this.apiEndpoint = res.body.apiEndpoint;
-    this.meta = res.body.meta;
+    this.content = res.body;
   }
 
   async fetchProfile(req: express$Request): Promise<Profile> {

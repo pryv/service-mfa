@@ -18,13 +18,9 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         if (mfaProfile.isActive()) {
           const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
-          res.status(302).send({mfaToken: mfaToken, meta: pryvConnection.meta});
+          res.status(302).send({mfaToken: mfaToken});
         } else {
-          res.status(200).send({
-            token: pryvConnection.token, 
-            apiEndpoint: pryvConnection.apiEndpoint,
-            meta: pryvConnection.meta
-          });
+          res.status(200).send(pryvConnection.content);
         }
 
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
