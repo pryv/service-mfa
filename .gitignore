@@ -16,4 +16,5 @@ dist
 build/build_tag
 build/release.tar
 test_results/
+application.log
 .vscode/
