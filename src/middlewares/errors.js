@@ -9,10 +9,11 @@ const logger = require('@pryv/boiler').getLogger('errors');
 /*eslint-disable no-unused-vars*/
 module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
   logger.debug('Error with message: ' + error.message, error);
-  
+
+  let meta;
   if (! (error instanceof ApiError)) {
     let message;
-
+    let errorId;
     if (error.response != null && error.response.body != null) {
       const errorBody = error.response.body;
       if (errorBody.message != null) {
@@ -20,8 +21,9 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
       } else if (errorBody.error != null && errorBody.error.message != null) {
         message = errorBody.error.message;
       }
+      meta = errorBody.meta;
+      errorId = errorBody.error.id;
     }
-
     if (message == null) {
       message = error.toString();
     }
@@ -32,12 +34,16 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
     }
     status = status || error.status;
 
-    error = new ApiError(status, message);
+    error = new ApiError(status, message, errorId);
   }
   const publicError = error.getPublicErrorData();
+
+  const response = { error: publicError };
+  if (meta) response.meta = meta;
+
   res
     .status(error.httpStatus || 500)
-    .json({error: publicError});
+    .json(response);
 
   logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:`, publicError);
 };

@@ -32,7 +32,7 @@ describe('POST /login', function () {
     phone: '1234'
   };
 
-  describe('XXXX when MFA is not activated', function () {
+  describe('when MFA is not activated', function () {
 
     let loginReq, profileReq, res;
     before(async () => {
@@ -104,9 +104,14 @@ describe('POST /login', function () {
   });
 
   describe('when the Pryv connection is invalid', function () {
-    const pryvError = { error: {
-      id: 'invalid-credentials',
-      message: 'The given username/password pair is invalid.'}
+    const pryvError = { 
+      error: {
+        id: 'invalid-credentials',
+        message: 'The given username/password pair is invalid.'
+      },
+      meta: { 
+        dummy: 'dummy'
+      }
     };
     
     let res;
@@ -120,6 +125,8 @@ describe('POST /login', function () {
     it('returns the Pryv error', async () => {
       assert.strictEqual(res.status, 401);
       assert.strictEqual(res.body.error.message, pryvError.error.message);
+      assert.strictEqual(res.body.error.id, pryvError.error.id);
+      assert.exists(res.body.meta);
     });
   });
 });
