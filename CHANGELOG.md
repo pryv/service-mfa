@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.0.2
+
+- Fix response: now forwarding all fields from core
+
 ### 1.0.1
 
 - Update node version to 12.13.1.
