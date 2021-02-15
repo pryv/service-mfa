@@ -17,5 +17,5 @@ host='eu.gcr.io'
 
 echo "---------------------------- building mfa --------------------------------"
 echo $host/pryvio/service-mfa:$version
-docker build -f $SCRIPT_FOLDER/service-mfa/Dockerfile -t $host/pryvio/service-mfa:$version .
+docker build --build-arg COMPONENT_NAME=service-mfa -f $SCRIPT_FOLDER/service-mfa/Dockerfile -t $host/pryvio/service-mfa:$version .
 docker push $host/pryvio/service-mfa:$version
