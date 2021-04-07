@@ -8,35 +8,12 @@ import type Profile from './Profile';
 
 class Service {
 
-  auth: string;
-  endpointChallenge: string;
-  endpointVerify: string;
   ttlMilliseconds: number;
   sessions: Map<string, Session>;
 
   constructor(settings: Object) {
-    this.auth = settings.get('sms:auth');
-    this.endpointChallenge = settings.get('sms:endpoints:challenge');
-    this.endpointVerify = settings.get('sms:endpoints:verify');
     this.ttlMilliseconds = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
-  }
-
-  async challenge(profile: Profile, req: express$Request): Promise<void> {
-    await request
-      .post(this.endpointChallenge)
-      .set('Authorization', this.auth)
-      .query(req.query)
-      .send(profile.content);
-  }
-
-  async verify(profile: Profile, req: express$Request): Promise<void> {
-    const body = Object.assign({}, req.body, profile.content);
-    await request
-      .post(this.endpointVerify)
-      .set('Authorization', this.auth)
-      .query(req.query)
-      .send(body);
   }
 
   hasSession(id: string): boolean {

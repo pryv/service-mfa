@@ -8,20 +8,20 @@ const { getConfig } = require('@pryv/boiler').init({
 
 const express = require('express');
 const middlewares = require('./middlewares');
-const MFAService = require('./business/mfa/Service');
+const ChallengeVerifyService = require('./business/mfa/ChallengeVerifyService');
+
+import type Service from './business/mfa/Service';
 
 class Application {
   express: express$Application;
-  settings: Object;
-  mfaService: MFAService;
+  settings: {};
+  mfaService: Service;
 
-  constructor() {
-
-  }
+  constructor() {}
 
   async init() {
     this.settings = await getConfig();
-    this.mfaService = new MFAService(this.settings);
+    this.mfaService = bootCorrectMfaService(this.settings);
     this.express = this.setupExpressApp();
     return this;
   }
@@ -40,6 +40,11 @@ class Application {
     
     return expressApp;
   }
+}
+
+function bootCorrectMfaService(settings: {}): Service {
+  const mode = settings.get('sms:mode');
+  if (mode === 'challenge-verify') return new ChallengeVerifyService(settings);
 }
 
 module.exports = Application;
