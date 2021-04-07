@@ -1,3 +1,5 @@
 .git
 .github
 test
+config/test-config.yml
+config/dev-config.yml
