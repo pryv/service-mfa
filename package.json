@@ -8,10 +8,12 @@
   "scripts": {
     "start": "node_modules/.bin/babel-node src/server.js --config dev-config.json",
     "release": "node_modules/.bin/babel src/ -d dist/",
+    "watch": "node_modules/.bin/babel --verbose --watch=src/ --out-dir=dist/",
     "test": "NODE_ENV=test node_modules/.bin/mocha --require babel-core/register --recursive test/"
   },
   "dependencies": {
     "@pryv/boiler": "https://github.com/pryv/lib-node-boiler.git",
+    "bluebird": "^3.7.2",
     "express": "^4.17.1",
     "uuid": "^3.3.3"
   },

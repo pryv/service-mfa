@@ -37,7 +37,7 @@ class Connection {
     return new Profile(mfaProfile.content, mfaProfile.recoveryCodes);
   }
 
-  async updateProfile(req: express$Request, profile: ?Profile): Promise<void> {
+  async updateProfile(reqHeaders: Map<string, string>, profile: ?Profile): Promise<void> {
     let update = null;
     if (profile != null) {
       update = {
@@ -47,7 +47,7 @@ class Connection {
     }
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
-      .set(allowedHeaders(req.headers))
+      .set(allowedHeaders(reqHeaders))
       .set('Authorization', this.token)
       .send({mfa: update});
   }

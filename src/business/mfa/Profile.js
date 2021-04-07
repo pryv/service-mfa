@@ -4,9 +4,9 @@ const uuidv4 = require('uuid/v4');
 class Profile {
 
   content: ?mixed;
-  recoveryCodes: Array;
+  recoveryCodes: Array<string>;
   
-  constructor(content: ?mixed, recoveryCodes: ?Array) {
+  constructor(content: ?mixed, recoveryCodes: ?Array<string>) {
     this.recoveryCodes = recoveryCodes || [];
     this.content = content;
   }

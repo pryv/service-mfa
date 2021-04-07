@@ -1,10 +1,8 @@
 // @flow
 
 const request = require('superagent');
-const Session = require('./Session');
 const Service = require('./Service');
 
-import type PryvConnection from '../pryv/Connection';
 import type Profile from './Profile';
 
 class ChallengeVerifyService extends Service {
@@ -20,21 +18,21 @@ class ChallengeVerifyService extends Service {
     this.endpointVerify = settings.get('sms:endpoints:verify');
   }
 
-  async challenge(profile: Profile, req: express$Request): Promise<void> {
+  async challenge(username: string, profile: Profile, query: {}): Promise<void> {
     await request
       .post(this.endpointChallenge)
       .set('Authorization', this.auth)
-      .query(req.query)
+      .query(query)
       .send(profile.content);
   }
 
-  async verify(profile: Profile, req: express$Request): Promise<void> {
-    const body = Object.assign({}, req.body, profile.content);
+  async verify(username: string, profile: Profile, query: {}, body: {}): Promise<void> {
+    const reqBody = Object.assign({}, body, profile.content);
     await request
       .post(this.endpointVerify)
       .set('Authorization', this.auth)
-      .query(req.query)
-      .send(body);
+      .query(query)
+      .send(reqBody);
   }
 
 }

@@ -22,7 +22,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
 
         const mfaProfile = new MFAProfile(req.body);
 
-        await mfaService.challenge(mfaProfile, req);
+        await mfaService.challenge(username, mfaProfile, req.query);
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
@@ -39,13 +39,14 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     middlewares.authorization,
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
-      try {
+      try { 
+        const username = req.params.username;
         const mfaSession = req.context.session;
         const mfaProfile = mfaSession.profile;
-        await mfaService.verify(mfaProfile, req);
+        await mfaService.verify(username, mfaProfile, req.query, req.body);
 
         mfaProfile.generateRecoveryCodes();
-        mfaSession.pryvConnection.updateProfile(req, mfaProfile);
+        await mfaSession.pryvConnection.updateProfile(req.headers, mfaProfile);
         mfaService.clearSession(mfaSession.id);
         res.status(200).send({recoveryCodes: mfaProfile.getRecoveryCodes()});
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
@@ -65,7 +66,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
 
         // Clears the MFA profile
-        await pryvConnection.updateProfile(req, null);
+        await pryvConnection.updateProfile(req.headers, null);
         res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
@@ -94,7 +95,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         }
 
         // Clears the MFA profile
-        await pryvConnection.updateProfile(req, null);
+        await pryvConnection.updateProfile(req.headers, null);
         res.status(200).send({ message: 'MFA deactivated.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
@@ -109,8 +110,9 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
+        const username = req.params.username;
         const mfaSession = req.context.session;
-        await mfaService.challenge(mfaSession.profile, req);
+        await mfaService.challenge(username, mfaSession.profile, req.query);
 
         res.status(200).send({ message: 'Please verify the MFA challenge.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
@@ -126,8 +128,9 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
     middlewares.mfaSession(mfaService),
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
       try {
+        const username = req.params.username;
         const mfaSession = req.context.session;
-        await mfaService.verify(mfaSession.profile, req);
+        await mfaService.verify(username, mfaSession.profile, req.query, req.body);
 
         mfaService.clearSession(mfaSession.id);
         res.status(200).send({token: mfaSession.pryvConnection.token});

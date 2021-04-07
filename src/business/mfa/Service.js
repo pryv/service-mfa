@@ -16,6 +16,14 @@ class Service {
     this.sessions = new Map();
   }
 
+  async challenge(username: string, profile: Profile, query: {}): Promise<void> {
+    throw new Error('override this method in a Service extension');
+  }
+
+  async verify(username: string, profile: Profile, query: {}, body: {}): Promise<void> {
+    throw new Error('override this method in a Service extension');
+  }
+
   hasSession(id: string): boolean {
     return this.sessions.has(id);
   }
