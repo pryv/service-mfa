@@ -1,14 +1,5 @@
 // @flow
 
-/*global describe, it, before */
-
-const assert = require('chai').assert;
-const Application = require('../../src/app');
-const app = new Application();
-const DummySession = require('../fixture/DummySession');
-const Mock = require('../fixture/Mock');
-const supertest = require('supertest');
-
 describe('POST /mfa/verify', function () {
   const username = 'testuser';
   const body = {code: '5678'};

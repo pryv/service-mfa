@@ -2,12 +2,6 @@
 
 /*global describe, it, before */
 
-const assert = require('chai').assert;
-const Application = require('../../src/app');
-const app = new Application();
-const Mock = require('../fixture/Mock');
-const supertest = require('supertest');
-
 describe('POST /login', function () {
   const username = 'testuser';
   let settings, coreEndpoint, request, loginHeaders;

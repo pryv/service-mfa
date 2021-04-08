@@ -2,21 +2,6 @@
 
 /*global describe, it, before */
 
-const _ = require('lodash');
-const assert = require('chai').assert;
-const Application = require('../../src/app');
-const app = new Application();
-const Mock = require('../fixture/Mock');
-const supertest = require('supertest');
-const { getConfig } = require('@pryv/boiler');
-const { 
-  singleUrl,
-  singleConfig,
-  singleMessage,
-  singleToken,
-  lettersToToken,
-} = require('../fixture/singleMode');
-
 describe('POST /mfa/activate', function() {
   let settings, coreEndpoint, challengeEndpoint, request;
   const username = 'testuser';

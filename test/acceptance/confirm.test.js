@@ -2,13 +2,6 @@
 
 /*global describe, it, before */
 
-const assert = require('chai').assert;
-const Application = require('../../src/app');
-const app = new Application();
-const Mock = require('../fixture/Mock');
-const DummySession = require('../fixture/DummySession');
-const supertest = require('supertest');
-
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
   const body = {code: '5678'};

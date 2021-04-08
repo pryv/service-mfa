@@ -1,13 +1,5 @@
 // @flow
 
-/*global describe, it, before */
-
-const assert = require('chai').assert;
-const Application = require('../../src/app');
-const app = new Application();
-const Mock = require('../fixture/Mock');
-const supertest = require('supertest');
-
 describe('POST /mfa/recover', function () {
   let settings, coreEndpoint, request, loginHeaders;
   const username = 'testuser';
