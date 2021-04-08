@@ -9,6 +9,13 @@ const app = new Application();
 const Mock = require('../fixture/Mock');
 const supertest = require('supertest');
 const { getConfig } = require('@pryv/boiler');
+const { 
+  singleUrl,
+  singleConfig,
+  singleMessage,
+  singleToken,
+  lettersToToken,
+} = require('../fixture/singleMode');
 
 describe('POST /mfa/activate', function() {
   let settings, coreEndpoint, challengeEndpoint, request;
@@ -120,25 +127,10 @@ describe('POST /mfa/activate', function() {
     });
   });
   describe('mode="single"', () => {
-    const singleUrl = 'https://api.smsmode.com/http/1.6/sendSMS.do';
     let config;
     before(async () => {
       config = await getConfig();
-      config.injectTestConfig({
-        sms: {
-          mode: 'single',
-          endpoints: {
-            single: {
-              url: singleUrl,
-              method: 'POST',
-              headers: {
-                authorization: 'api-key-123',
-                other: 'something',
-              },
-            }
-          }
-        }
-      });
+      config.injectTestConfig(singleConfig);
       await app.init();
       settings = app.settings;
       coreEndpoint = `${settings.get('core:url')}/${username}`;
@@ -150,9 +142,8 @@ describe('POST /mfa/activate', function() {
 
     const profileContent = {
       emetteur: '1234',
-      message: 'Hi, here is your MFA code: {{ code }}'
+      message: singleMessage,
     };
-    const lettersToCode = profileContent.message.indexOf('{{ code }}');
     let accessInfoReq, challengeReq, res;
     before(async () => {
       new Mock(
@@ -179,9 +170,9 @@ describe('POST /mfa/activate', function() {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
       assert.equal(body.emetteur, profileContent.emetteur, 'activation content did not match');
-      const number = body.message.substring(lettersToCode);
+      const number = body.message.substring(lettersToToken);
       assert.equal(
-        profileContent.message.replace('{{ code }}', number),
+        profileContent.message.replace(singleToken, number),
         body.message,
         'message with generated code did not match'
       );

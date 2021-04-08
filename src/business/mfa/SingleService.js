@@ -9,7 +9,6 @@ const replaceRecursively = require('../../utils/replaceRecursively');
 import type Profile from './Profile';
 
 const CODE_LENGTH = 4;
-const CODE_TOKEN = '{{ code }}';
 
 class ChallengeVerifyService extends Service {
 
@@ -17,6 +16,7 @@ class ChallengeVerifyService extends Service {
   singleUrl: string;
   endpointVerify: string;
   apiMethod: string;
+  token: string;
   /**
    * username -> code
    */
@@ -27,6 +27,7 @@ class ChallengeVerifyService extends Service {
     this.headers = settings.get('sms:endpoints:single:headers');
     this.singleUrl = settings.get('sms:endpoints:single:url');
     this.apiMethod = settings.get('sms:endpoints:single:method');
+    this.token = settings.get('sms:token');
     this.codes = new Map();
   }
 
@@ -34,7 +35,7 @@ class ChallengeVerifyService extends Service {
     const code = await generateCode(CODE_LENGTH);
     this.codes.set(username, code);
 
-    const payload = replaceRecursively(profile.content, CODE_TOKEN, code);
+    const payload = replaceRecursively(profile.content, this.token, code);
 
     await makeRequest(this.apiMethod, this.singleUrl, this.headers, payload, query);
   }
