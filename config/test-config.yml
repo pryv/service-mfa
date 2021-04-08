@@ -13,9 +13,15 @@ logs:
 core:
   url: https://co2.pryv.li
 sms:
+  mode: 'challenge-verify'  # allowed: 'challenge-verify', 'single'
   endpoints:
     challenge: https://api.smsapi.com/mfa/codes
     verify: https://api.smsapi.com/mfa/codes/verifications
+    # single: 
+    #   url: https://api.smsmode.com/http/1.6/sendSMS.do
+    #   method: 'POST'
+    #   headers:
+    #     authorization: 'MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls'  
   auth: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
 sessions:
   ttlSeconds: 0.2

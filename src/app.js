@@ -9,6 +9,7 @@ const { getConfig } = require('@pryv/boiler').init({
 const express = require('express');
 const middlewares = require('./middlewares');
 const ChallengeVerifyService = require('./business/mfa/ChallengeVerifyService');
+const SingleService = require('./business/mfa/SingleService');
 
 import type Service from './business/mfa/Service';
 
@@ -45,6 +46,7 @@ class Application {
 function bootCorrectMfaService(settings: {}): Service {
   const mode = settings.get('sms:mode');
   if (mode === 'challenge-verify') return new ChallengeVerifyService(settings);
+  if (mode === 'single') return new SingleService(settings);
 }
 
 module.exports = Application;
