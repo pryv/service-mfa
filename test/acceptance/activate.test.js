@@ -152,6 +152,7 @@ describe('POST /mfa/activate', function() {
       emetteur: '1234',
       message: 'Hi, here is your MFA code: {{ code }}'
     };
+    const lettersToCode = profileContent.message.indexOf('{{ code }}');
     let accessInfoReq, challengeReq, res;
     before(async () => {
       new Mock(
@@ -178,7 +179,6 @@ describe('POST /mfa/activate', function() {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
       assert.equal(body.emetteur, profileContent.emetteur, 'activation content did not match');
-      const lettersToCode = 'Hi, here is your MFA code: '.length;
       const number = body.message.substring(lettersToCode);
       assert.equal(
         profileContent.message.replace('{{ code }}', number),
