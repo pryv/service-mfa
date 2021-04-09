@@ -10,7 +10,7 @@ import type Profile from './Profile';
 
 const CODE_LENGTH = 4;
 
-class ChallengeVerifyService extends Service {
+class SingleService extends Service {
 
   headers: Map<string, string>;
   singleUrl: string;
@@ -65,4 +65,4 @@ async function makeRequest(method: string, url: string, headers: Map<string, str
 
 
 
-module.exports = ChallengeVerifyService;
+module.exports = SingleService;

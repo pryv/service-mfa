@@ -129,6 +129,9 @@ describe('POST /mfa/activate', function() {
       emetteur: '1234',
       message: singleMessage,
     };
+    const query = {
+      value: '1',
+    };
     let accessInfoReq, challengeReq, res;
     before(async () => {
       new Mock(
@@ -139,22 +142,23 @@ describe('POST /mfa/activate', function() {
         { token: pryvToken },
         req => (accessInfoReq = req)
       );
-      new Mock(singleUrl, '', 'POST', 200, {}, req => challengeReq = req);
+      new Mock(singleUrl, '', 'POST', 200, {}, req => { challengeReq = req}, query);
       res = await request
         .post(`/${username}/mfa/activate`)
+        .query(query)
         .set('Authorization', pryvToken)
         .send(profileContent);
     });
 
-    it('checks the validity of the provided Pryv token', async () => {
+    it('checks the validity of the provided Pryv token', () => {
       assert.isDefined(accessInfoReq);
       assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
     });
 
-    it('forwards the correct information to the MFA service', async () => {
+    it('forwards the information to the MFA service', () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
-      assert.equal(body.emetteur, profileContent.emetteur, 'activation content did not match');
+      assert.deepEqual(_.omit(body, ['message']), _.omit(profileContent, ['message']), 'activation content did not match');
       const number = body.message.substring(lettersToToken);
       assert.equal(
         profileContent.message.replace(singleToken, number),
@@ -162,12 +166,13 @@ describe('POST /mfa/activate', function() {
         'message with generated code did not match'
       );
       assert.deepEqual(
-        _.pick(challengeReq.headers, ['authorization', 'other']),
+        _.pick(challengeReq.headers, Object.keys(settings.get('sms:endpoints:single:headers'))),
         settings.get('sms:endpoints:single:headers'),
       );
+      assert.deepEqual(challengeReq.query, query);
     });
 
-    it('answers 302 with a generated MFA session token', async () => {
+    it('answers 302 with a generated MFA session token', () => {
       assert.strictEqual(res.status, 302);
       assert.isDefined(res.body.mfaToken);
     });
