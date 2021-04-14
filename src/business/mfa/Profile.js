@@ -1,5 +1,6 @@
 // @flow
 const uuidv4 = require('uuid/v4');
+const _ = require('lodash');
 
 class Profile {
 
@@ -16,9 +17,9 @@ class Profile {
   }
 
   isActive() {
-    return this.body != null ||
-      this.query != null ||
-      this.headers != null;
+    return  ! _.isEmpty(this.body) ||
+            ! _.isEmpty(this.query) ||
+            ! _.isEmpty(this.headers);
   }
 
   generateRecoveryCodes () {
