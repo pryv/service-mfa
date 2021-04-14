@@ -58,7 +58,7 @@ describe('POST /mfa/confirm', function () {
       assert.deepEqual(res.body.recoveryCodes, session.profile.recoveryCodes);
     });
   
-    describe('when the MFA verification fails', function () {
+    describe('when the MFA verification returns an error', function () {
       const serviceError = { error: {
         id: 'invalid-code',
         message: 'Invalid MFA code.'}
@@ -109,7 +109,7 @@ describe('POST /mfa/confirm', function () {
     });
   
     it('verifies the MFA challenge', async () => {
-      assert.equal(res.status, 200, 'MFA confirmation was unsuccessful')
+      assert.equal(res.status, 200, 'MFA confirmation was unsuccessful');
     });
   
     it('updates the Pryv profile with the MFA parameters', async () => {
@@ -146,7 +146,7 @@ describe('POST /mfa/confirm', function () {
           .send({code});
       });
   
-      it('returns the MFA external service error', async () => {
+      it('returns an invalid-code error', async () => {
         assert.equal(res.status, 400);
         assert.equal(res.body.error.id, 'invalid-code');
         assert.strictEqual(res.body.error.message, 'The provided code is invalid: ' + code);
