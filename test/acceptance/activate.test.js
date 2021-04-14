@@ -26,7 +26,7 @@ describe('POST /mfa/activate', function() {
         '/access-info',
         'GET',
         200,
-        { token: pryvToken },
+        { token: pryvToken, type: 'personal' },
         req => (accessInfoReq = req)
       );
       new Mock(
@@ -49,7 +49,7 @@ describe('POST /mfa/activate', function() {
     });
 
     it('triggers the MFA challenge', async () => {
-      assert.isDefined(challengeReq);
+      assert.isDefined(challengeReq, 'challenge not sent');
       assert.deepEqual(challengeReq.body, profileContent);
       assert.strictEqual(
         challengeReq.headers['authorization'],
@@ -96,7 +96,7 @@ describe('POST /mfa/activate', function() {
       let res;
       before(async () => {
         new Mock(coreEndpoint, '/access-info', 'GET', 200, {
-          token: pryvToken
+          token: pryvToken, type: 'personal',
         });
         new Mock(challengeEndpoint, '', 'POST', 400, serviceError);
         res = await request
@@ -136,7 +136,7 @@ describe('POST /mfa/activate', function() {
         '/access-info',
         'GET',
         200,
-        { token: pryvToken },
+        { token: pryvToken, type: 'personal' },
         req => (accessInfoReq = req)
       );
       new Mock(single.url, '', 'POST', 200, {}, req => { challengeReq = req}, query);
@@ -190,7 +190,7 @@ describe('POST /mfa/activate', function() {
       let res;
       before(async () => {
         new Mock(coreEndpoint, '/access-info', 'GET', 200, {
-          token: pryvToken
+          token: pryvToken, type: 'personal',
         });
         new Mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
@@ -203,6 +203,39 @@ describe('POST /mfa/activate', function() {
         assert.strictEqual(res.status, 400);
         assert.strictEqual(res.body.error.message, serviceError.error.message);
       });
+    });
+  });
+
+  describe('when the provide token is not personal', () => {
+    before(async () => {
+      await app.init();
+    });
+
+    let accessInfoReq, challengeReq, res;
+    before(async () => {
+      new Mock(
+        coreEndpoint,
+        '/access-info',
+        'GET',
+        200,
+        { token: pryvToken, type: 'app' },
+        req => (accessInfoReq = req)
+      );
+      res = await request
+        .post(`/${username}/mfa/activate`)
+        .set('Authorization', pryvToken)
+        .send({});
+    });
+
+    it('checks the validity of the provided Pryv token', () => {
+      assert.isDefined(accessInfoReq);
+      assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
+    });
+    it('returns a forbidden error', () => {
+      assert.equal(res.status, 403);
+      const body = res.body;
+      assert.equal(body.error.id, 'forbidden');
+      assert.equal(body.error.message, 'You cannot access this resource using the given access token.');
     });
   });
 });

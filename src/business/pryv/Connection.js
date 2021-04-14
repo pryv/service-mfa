@@ -3,6 +3,8 @@
 const request = require('superagent');
 const Profile = require('../mfa/Profile');
 
+const PERSONAL_ACCESS_TYPE = 'personal';
+
 class Connection {
 
   token: ?string;
@@ -56,10 +58,16 @@ class Connection {
   }
 
   async checkAccess(req: express$Request): Promise<void> {
-    await request
+    const res = await request
       .get(`${this.coreUrl}/${this.username}/access-info`)
       .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
+    if (res.body.type !== PERSONAL_ACCESS_TYPE) {
+      const error = new Error('You cannot access this resource using the given access token.');
+      error.id = 'forbidden';
+      error.status = 403;
+      throw error;
+    }
   }
 }
 
