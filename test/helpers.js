@@ -1,12 +1,5 @@
 
 const { getConfig } = require('@pryv/boiler');
-const { 
-  singleUrl,
-  singleConfig,
-  singleMessage,
-  singleToken,
-  lettersToToken,
-} = require('./fixture/singleMode');
 const Application = require('../src/app');
 
 Object.assign(global, {
@@ -17,10 +10,7 @@ Object.assign(global, {
   DummySession: require('./fixture/DummySession'),
   supertest: require('supertest'),
   getConfig,
-  singleUrl,
-  singleConfig,
-  singleMessage,
-  singleToken,
-  lettersToToken,
+  single: require('./fixture/singleMode'),
+  replaceRecursively: require('../src/utils/replaceRecursively'),
 });
 

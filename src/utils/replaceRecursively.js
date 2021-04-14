@@ -7,7 +7,8 @@
  * @param {*} token 
  * @param {*} code 
  */
-function replaceRecursively(object: {}, token: string, code: string): {} {
+function replaceRecursively(object: mixed, token: string, code: string): {} {
+  if (object == null) return {};
   Object.keys(object).forEach(key => {
     if (typeof object[key] === 'string') return object[key] = object[key].replace(token, code); 
     if (Object.prototype.toString.call(object[key])) return replaceRecursively(object[key], token, code); 

@@ -8,7 +8,7 @@ const logger = require('@pryv/boiler').getLogger('errors');
 // NOTE: next is not used, since the request is terminated on all errors. 
 /*eslint-disable no-unused-vars*/
 module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
-  logger.debug('Error with message: ' + error.message, error);
+  logger.info('Error with message: ' + error.message, error);
 
   let meta;
   if (! (error instanceof ApiError)) {
@@ -24,9 +24,10 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
       meta = errorBody.meta;
       errorId = errorBody.error.id;
     }
-    if (message == null) {
-      message = error.toString();
-    }
+    if (message == null && error.message != null) message = error.message;
+    if (message == null) message = error.toString();
+    
+    if (error.id != null) errorId = error.id;
     
     let status;
     if (error.response != null) {

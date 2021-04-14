@@ -3,16 +3,22 @@ const uuidv4 = require('uuid/v4');
 
 class Profile {
 
-  content: ?mixed;
+  body: mixed;
+  query: mixed;
+  headers: mixed;
   recoveryCodes: Array<string>;
   
-  constructor(content: ?mixed, recoveryCodes: ?Array<string>) {
+  constructor(body: mixed = {}, query: mixed = {}, headers: mixed = {}, recoveryCodes: ?Array<string>) {
     this.recoveryCodes = recoveryCodes || [];
-    this.content = content;
+    this.body = body;
+    this.query = query;
+    this.headers = headers;
   }
 
   isActive() {
-    return this.content != null;
+    return this.body != null ||
+      this.query != null ||
+      this.headers != null;
   }
 
   generateRecoveryCodes () {

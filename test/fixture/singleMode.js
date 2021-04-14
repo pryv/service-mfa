@@ -1,27 +1,45 @@
 
-const singleUrl = 'https://api.smsmode.com/http/1.6/sendSMS.do';
+const url = 'https://api.smsmode.com/http/1.6/sendSMS.do';
 const token = '{{ token }}';
-const singleMessage = 'Hi, here is your MFA code: ' + token;
+const message = 'Hi, here is your MFA code: ' + token;
+const phoneNumber = '1234';
+
+const authKey = '{{ authorization }}';
+const authValue = 'api-key-123';
 
 module.exports = {
-  singleUrl,
-  singleToken: token,
-  lettersToToken: singleMessage.indexOf(token),
-  singleConfig: {
+  url,
+  token,
+  lettersToToken: message.indexOf(token),
+  message,
+  phoneNumber,
+  authKey,
+  authValue,
+  config: {
     sms: {
       mode: 'single',
+      token,
+      variables: {
+        [authKey]: authValue,
+      },
       endpoints: {
         single: {
-          url: singleUrl,
+          url,
           method: 'POST',
-          headers: {
-            authorization: 'api-key-123',
-            other: 'something',
-          },
-        }
+        },
       },
-      token,
-    }
+    },
   },
-  singleMessage,
-}
+  profile: { // will be stored under object "mfa"
+    body: { // older - "content"
+      message,
+      phoneNumber,
+    },
+    query: {
+      authorization: authKey,
+    },
+    headers: {
+      authorization: authKey,
+    },
+  },
+};

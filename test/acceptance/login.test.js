@@ -91,7 +91,7 @@ describe('POST /login', function () {
       const pryvConnection = session.pryvConnection;
       assert.isDefined(profile);
       assert.isDefined(pryvConnection);
-      assert.deepEqual(profile.content, profileContent);
+      assert.deepEqual(profile.body, profileContent);
       assert.strictEqual(pryvConnection.username, username);
       assert.strictEqual(pryvConnection.token, pryvToken);
     });

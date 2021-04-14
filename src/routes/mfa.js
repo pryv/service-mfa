@@ -20,9 +20,19 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
         await pryvConnection.checkAccess(req);
 
-        const mfaProfile = new MFAProfile(req.body);
+        const reqBody = req.body;
+        let body = {};
 
-        await mfaService.challenge(username, mfaProfile, req.query);
+        // retro compat
+        if (reqBody.body == null && reqBody.query == null && reqBody.headers == null) {
+          body = reqBody;
+        } else {
+          body = reqBody.body;
+        }
+
+        const mfaProfile = new MFAProfile(body, reqBody.query, reqBody.headers);
+
+        await mfaService.challenge(username, mfaProfile, req);
 
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
 
@@ -43,7 +53,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const username = req.params.username;
         const mfaSession = req.context.session;
         const mfaProfile = mfaSession.profile;
-        await mfaService.verify(username, mfaProfile, req.query, req.body);
+        await mfaService.verify(username, mfaProfile, req);
 
         mfaProfile.generateRecoveryCodes();
         await mfaSession.pryvConnection.updateProfile(req.headers, mfaProfile);
@@ -112,7 +122,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
       try {
         const username = req.params.username;
         const mfaSession = req.context.session;
-        await mfaService.challenge(username, mfaSession.profile, req.query);
+        await mfaService.challenge(username, mfaSession.profile, req);
 
         res.status(200).send({ message: 'Please verify the MFA challenge.' });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
@@ -130,7 +140,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
       try {
         const username = req.params.username;
         const mfaSession = req.context.session;
-        await mfaService.verify(username, mfaSession.profile, req.query, req.body);
+        await mfaService.verify(username, mfaSession.profile, req);
 
         mfaService.clearSession(mfaSession.id);
         res.status(200).send({token: mfaSession.pryvConnection.token});

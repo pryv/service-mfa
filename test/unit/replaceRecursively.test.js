@@ -21,4 +21,7 @@ describe('replaceRecursively', () => {
     assert.equal(replaced.b.d, object.b.d);
     assert.equal(replaced.e, object.e);
   });
+  it('must accept undefined', () => {
+    assert.deepEqual(replaceRecursively(), {});
+  });
 });

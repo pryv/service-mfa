@@ -16,11 +16,11 @@ class Service {
     this.sessions = new Map();
   }
 
-  async challenge(username: string, profile: Profile, query: {}): Promise<void> {
+  async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     throw new Error('override this method in a Service extension');
   }
 
-  async verify(username: string, profile: Profile, query: {}, body: {}): Promise<void> {
+  async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     throw new Error('override this method in a Service extension');
   }
 

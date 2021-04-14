@@ -115,7 +115,7 @@ describe('POST /mfa/activate', function() {
     let config;
     before(async () => {
       config = await getConfig();
-      config.injectTestConfig(singleConfig);
+      config.injectTestConfig(single.config);
       await app.init();
       settings = app.settings;
       coreEndpoint = `${settings.get('core:url')}/${username}`;
@@ -125,13 +125,10 @@ describe('POST /mfa/activate', function() {
       config.injectTestConfig({});
     });
 
-    const profileContent = {
-      emetteur: '1234',
-      message: singleMessage,
-    };
-    const query = {
-      value: '1',
-    };
+    const profile = single.profile;
+    const query = replaceRecursively(profile.query, single.authKey, single.authValue);
+    const headers = replaceRecursively(profile.headers, single.authKey, single.authValue);
+
     let accessInfoReq, challengeReq, res;
     before(async () => {
       new Mock(
@@ -142,12 +139,11 @@ describe('POST /mfa/activate', function() {
         { token: pryvToken },
         req => (accessInfoReq = req)
       );
-      new Mock(singleUrl, '', 'POST', 200, {}, req => { challengeReq = req}, query);
+      new Mock(single.url, '', 'POST', 200, {}, req => { challengeReq = req}, query);
       res = await request
         .post(`/${username}/mfa/activate`)
-        .query(query)
         .set('Authorization', pryvToken)
-        .send(profileContent);
+        .send(profile);
     });
 
     it('checks the validity of the provided Pryv token', () => {
@@ -158,16 +154,22 @@ describe('POST /mfa/activate', function() {
     it('forwards the information to the MFA service', () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
-      assert.deepEqual(_.omit(body, ['message']), _.omit(profileContent, ['message']), 'activation content did not match');
-      const number = body.message.substring(lettersToToken);
+      assert.deepEqual(_.omit(body, ['message']), _.omit(profile.body, ['message']), 'activation content did not match');
+      const number = body.message.substring(single.lettersToToken);
       assert.equal(
-        profileContent.message.replace(singleToken, number),
+        profile.body.message.replace(single.token, number),
         body.message,
         'message with generated code did not match'
       );
       assert.deepEqual(
-        _.pick(challengeReq.headers, Object.keys(settings.get('sms:endpoints:single:headers'))),
-        settings.get('sms:endpoints:single:headers'),
+        _.pick(challengeReq.headers, Object.keys(headers)),
+        single.profile.headers,
+        'headers are not substituted'
+      );
+      assert.deepEqual(
+        _.pick(challengeReq.query, Object.keys(query)),
+        single.profile.query,
+        'query params are not substituted'
       );
       assert.deepEqual(challengeReq.query, query);
     });
@@ -190,11 +192,11 @@ describe('POST /mfa/activate', function() {
         new Mock(coreEndpoint, '/access-info', 'GET', 200, {
           token: pryvToken
         });
-        new Mock(singleUrl, '', 'POST', 400, serviceError);
+        new Mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
           .post(`/${username}/mfa/activate`)
           .set('Authorization', pryvToken)
-          .send(profileContent);
+          .send(profile);
       });
 
       it('returns the MFA external service error', async () => {

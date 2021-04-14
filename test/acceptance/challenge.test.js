@@ -28,7 +28,7 @@ describe('POST /mfa/challenge', function () {
   
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq);
-      assert.deepEqual(challengeReq.body, session.profile.content);
+      assert.deepEqual(challengeReq.body, session.profile.body);
       assert.strictEqual(challengeReq.headers['authorization'], auth);
     });
   
@@ -75,18 +75,18 @@ describe('POST /mfa/challenge', function () {
   
     let challengeReq, res, session, profileContent;
     before(async () => {
-      session = new DummySession(app, username, { message: singleMessage });
-      profileContent = session.profile.content;
+      session = new DummySession(app, username);
+      profileContent = session.profile.body;
       new Mock(singleUrl, '', 'POST', 200, {}, (req) => challengeReq = req);
       res = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
-        .send({});
+        .send({ message: singleMessage });
     });
   
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq);
-      assert.deepEqual(challengeReq.body, session.profile.content);
+      assert.deepEqual(challengeReq.body, session.profile.body);
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
       assert.equal(body.emetteur, profileContent.emetteur, 'activation content did not match');

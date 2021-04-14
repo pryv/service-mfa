@@ -18,20 +18,20 @@ class ChallengeVerifyService extends Service {
     this.endpointVerify = settings.get('sms:endpoints:verify');
   }
 
-  async challenge(username: string, profile: Profile, query: {}): Promise<void> {
+  async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     await request
       .post(this.endpointChallenge)
       .set('Authorization', this.auth)
-      .query(query)
-      .send(profile.content);
+      .query(profile.query)
+      .send(profile.body);
   }
 
-  async verify(username: string, profile: Profile, query: {}, body: {}): Promise<void> {
-    const reqBody = Object.assign({}, body, profile.content);
+  async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
+    const reqBody = Object.assign({}, clientRequest.body, profile.body);
     await request
       .post(this.endpointVerify)
       .set('Authorization', this.auth)
-      .query(query)
+      .query(clientRequest.query)
       .send(reqBody);
   }
 

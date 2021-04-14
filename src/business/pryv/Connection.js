@@ -34,14 +34,17 @@ class Connection {
     const pryvProfile = res.body.profile;
     const mfaProfile = pryvProfile.mfa;
     if (mfaProfile == null) return new Profile();
-    return new Profile(mfaProfile.content, mfaProfile.recoveryCodes);
+    const body = mfaProfile.body || mfaProfile.content; // retro-compatibility
+    return new Profile(body, mfaProfile.query, mfaProfile.headers, mfaProfile.recoveryCodes);
   }
 
   async updateProfile(reqHeaders: Map<string, string>, profile: ?Profile): Promise<void> {
     let update = null;
     if (profile != null) {
       update = {
-        content: profile.content,
+        body: profile.body,
+        query: profile.query,
+        headers: profile.headers,
         recoveryCodes: profile.recoveryCodes,
       };
     }
