@@ -9,7 +9,6 @@ const replaceRecursively = require('../../utils/replaceRecursively');
 import type Profile from './Profile';
 
 const CODE_LENGTH = 4;
-const CODE_TTL_MS = 60000;
 
 class SingleService extends Service {
 
@@ -62,11 +61,11 @@ class SingleService extends Service {
     }
   }
 
-  setCode(username: string, code: string, ttlMilliseconds: number = CODE_TTL_MS): void {
+  setCode(username: string, code: string): void {
     this.codes.set(username, code);
     this.timeouts.set(username, setTimeout(() => {
       this.clearCode(username);
-    }, ttlMilliseconds)
+    }, this.ttlMilliseconds)
     );
   }
 
