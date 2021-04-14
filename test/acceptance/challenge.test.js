@@ -64,7 +64,7 @@ describe('POST /mfa/challenge', function () {
     let config;
     before(async () => {
       config = await getConfig();
-      config.injectTestConfig(singleConfig);
+      config.injectTestConfig(single.config);
       await app.init();
       settings = app.settings;
       request = supertest(app.express);
@@ -73,34 +73,40 @@ describe('POST /mfa/challenge', function () {
       config.injectTestConfig({});
     });
   
-    let challengeReq, res, session, profileContent;
+    let challengeReq, res, profile, headers, query;
     before(async () => {
-      session = new DummySession(app, username);
-      profileContent = session.profile.body;
-      new Mock(singleUrl, '', 'POST', 200, {}, (req) => challengeReq = req);
+      session = new DummySession(app, username, single.profile);
+      profile = session.profile;
+      query = replaceRecursively(profile.query, single.authKey, single.authValue);
+      headers = replaceRecursively(profile.headers, single.authKey, single.authValue);
+      new Mock(single.url, '', 'POST', 200, {}, (req) => challengeReq = req, query);
       res = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
-        .send({ message: singleMessage });
+        .send();
     });
   
     it('triggers the MFA challenge', async () => {
-      assert.isDefined(challengeReq);
-      assert.deepEqual(challengeReq.body, session.profile.body);
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
-      assert.equal(body.emetteur, profileContent.emetteur, 'activation content did not match');
-      const lettersToCode = 'Hi, here is your MFA code: '.length;
-      const number = body.message.substring(lettersToCode);
+      assert.deepEqual(_.omit(body, ['message']), _.omit(profile.body, ['message']), 'activation content did not match');
+      const number = body.message.substring(single.lettersToToken);
       assert.equal(
-        profileContent.message.replace('{{ code }}', number),
+        profile.body.message.replace(single.token, number),
         body.message,
         'message with generated code did not match'
       );
       assert.deepEqual(
-        _.pick(challengeReq.headers, ['authorization', 'other']),
-        settings.get('sms:endpoints:single:headers'),
+        _.pick(challengeReq.headers, Object.keys(headers)),
+        single.profile.headers,
+        'headers are not substituted'
       );
+      assert.deepEqual(
+        _.pick(challengeReq.query, Object.keys(query)),
+        single.profile.query,
+        'query params are not substituted'
+      );
+      assert.deepEqual(challengeReq.query, query);
     });
   
     it('answers 200 and asks to verify the MFA challenge', async () => {
@@ -116,8 +122,8 @@ describe('POST /mfa/challenge', function () {
   
       let res;
       before(async () => {
-        const mfaToken = new DummySession(app, username).mfaToken;
-        new Mock(singleUrl, '', 'POST', 400, serviceError);
+        const mfaToken = new DummySession(app, username, single.profile).mfaToken;
+        new Mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
           .post(`/${username}/mfa/challenge`)
           .set('Authorization', mfaToken)
