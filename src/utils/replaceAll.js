@@ -3,6 +3,8 @@
 /**
  * Replaces all occurences of "search" with "replace" in "text"
  * 
+ * This implementation is known to be slow, use regexp or future native .replaceAll instead
+ * 
  * @param {*} text 
  * @param {*} search 
  * @param {*} replace 
