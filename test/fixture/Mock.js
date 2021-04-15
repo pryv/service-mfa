@@ -11,7 +11,11 @@ class Mock {
       .query(query)
       .reply(function (uri, requestBody) {
         if (typeof cb === 'function') {
-          cb(Object.assign({}, this.req, {body: requestBody}, {query: parseQueryString(this.req.path)}));
+          cb(Object.assign({}, 
+            this.req,
+            {body: requestBody},
+            {query: parseQueryString(this.req.path)},
+          ));
         }
         return [status, res];
       });

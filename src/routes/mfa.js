@@ -20,17 +20,7 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
         const pryvConnection = new PryvConnection(settings, username, pryvToken);
         await pryvConnection.checkAccess(req);
 
-        const reqBody = req.body;
-        let body = {};
-
-        // retro compat
-        if (reqBody.body == null && reqBody.query == null && reqBody.headers == null) {
-          body = reqBody;
-        } else {
-          body = reqBody.body;
-        }
-
-        const mfaProfile = new MFAProfile(body, reqBody.query, reqBody.headers);
+        const mfaProfile = new MFAProfile(req.body);
 
         await mfaService.challenge(username, mfaProfile, req);
 

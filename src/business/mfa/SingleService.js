@@ -6,18 +6,18 @@ const request = require('superagent');
 const Service = require('./Service');
 const generateCode = require('./generateCode');
 const replaceRecursively = require('../../utils/replaceRecursively');
+const replaceAll = require('../../utils/replaceAll');
 import type Profile from './Profile';
 
 const CODE_LENGTH = 4;
+const TOKEN = 'token';
 
 class SingleService extends Service {
 
-  headers: Map<string, string>;
-  singleUrl: string;
-  endpointVerify: string;
+  url: string;
   apiMethod: string;
-  token: string;
-  replacements: Map<string, string>;
+  headers: Map<string, string>;
+  body: string;
   /**
    * username -> code
    */
@@ -26,11 +26,10 @@ class SingleService extends Service {
 
   constructor(settings: Object) {
     super(settings);
-    this.headers = settings.get('sms:endpoints:single:headers');
-    this.singleUrl = settings.get('sms:endpoints:single:url');
+    this.url = settings.get('sms:endpoints:single:url');
     this.apiMethod = settings.get('sms:endpoints:single:method');
-    this.token = settings.get('sms:token');
-    this.replacements = settings.get('sms:variables');
+    this.headers = settings.get('sms:endpoints:single:headers');
+    this.body = settings.get('sms:endpoints:single:body');
     this.codes = new Map();
     this.timeouts = new Map();
   }
@@ -38,15 +37,20 @@ class SingleService extends Service {
   async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     const code: string = await generateCode(CODE_LENGTH);
     this.setCode(username, code);
-    const replacements: Map<string, string> = _.extend(this.replacements, { [this.token]: code });
+    const bodyWithToken = replaceRecursively(profile.body, `{{ ${TOKEN} }}`, code);
+    const replacements: Map<string, string> = _.extend(bodyWithToken, { [TOKEN]: code });
 
+    let url = this.url;
+    let headers = this.headers;
+    let body = this.body;
     for (const [key, value] of Object.entries(replacements)) {
-      profile.body = replaceRecursively(profile.body, key, value);
-      profile.query = replaceRecursively(profile.query, key, value);
-      profile.headers = replaceRecursively(profile.headers, key, value);
+      headers = replaceRecursively(headers, `{{ ${key} }}`, value);
+      body = replaceAll(body, `{{ ${key} }}`, value);
+      url = replaceAll(url, `{{ ${key} }}`, value);
     }
+    
 
-    await makeRequest(this.apiMethod, this.singleUrl, profile.headers, profile.body, profile.query);
+    await makeRequest(this.apiMethod, url, headers, body);
   }
 
   async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
@@ -73,24 +77,21 @@ class SingleService extends Service {
     this.codes.delete(username);
     clearTimeout(this.timeouts.get(username));
   }
-
 }
 
-async function makeRequest(method: string, url: string, headers: Map<string, string>, body: {}, query: mixed): Promise<void> {
+async function makeRequest(method: string, url: string, headers: Map<string, string>, body: {}): Promise<void> {
   if (method === 'POST') {
     return await request
       .post(url)
       .set(headers)
-      .query(query)
       .send(body);
   } else { // GET
     return request
       .get(url)
-      .set(headers)
-      .query(query);
+      .set(headers);
   }
 }
 
-
+SingleService.TOKEN = TOKEN;
 
 module.exports = SingleService;

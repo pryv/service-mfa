@@ -1,45 +1,47 @@
+const qs = require('querystring');
 
 const url = 'https://api.smsmode.com/http/1.6/sendSMS.do';
 const token = '{{ token }}';
 const message = 'Hi, here is your MFA code: ' + token;
+const messageWithCode = (code) => message.replace(token, code);
+const lettersToToken = message.indexOf(token)
+const extractCodeFromBody = (body) => body.message.substring(lettersToToken);
 const phoneNumber = '1234';
 
-const authKey = '{{ authorization }}';
 const authValue = 'api-key-123';
+const query = `phoneNumber={{ phoneNumber }}&auth=${authValue}`;
+const headers = { 
+  authorization: authValue,
+  'content-type': 'application/json',
+};
+const body = {phoneNumber: '{{ phoneNumber }}', message: '{{ message }}'};
 
 module.exports = {
-  url,
+  url: `${url}?${query}`,
   token,
-  lettersToToken: message.indexOf(token),
   message,
+  messageWithCode,
+  bodyWithCode: (code) => { return { phoneNumber, message: messageWithCode(code) }; },
+  extractCodeFromBody,
   phoneNumber,
-  authKey,
   authValue,
+  headers,
+  query: qs.parse(query.replace('{{ phoneNumber }}', '1234')),
   config: {
     sms: {
       mode: 'single',
-      token,
-      variables: {
-        [authKey]: authValue,
-      },
       endpoints: {
         single: {
-          url,
+          url: `${url}?${query}`,
           method: 'POST',
+          body: JSON.stringify(body),
+          headers,
         },
       },
     },
   },
-  profile: { // will be stored under object "mfa"
-    body: { // older - "content"
-      message,
-      phoneNumber,
-    },
-    query: {
-      authorization: authKey,
-    },
-    headers: {
-      authorization: authKey,
-    },
+  profile: {
+    phoneNumber,
+    message,
   },
 };

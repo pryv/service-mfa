@@ -126,8 +126,8 @@ describe('POST /mfa/activate', function() {
     });
 
     const profile = single.profile;
-    const query = replaceRecursively(profile.query, single.authKey, single.authValue);
-    const headers = replaceRecursively(profile.headers, single.authKey, single.authValue);
+    const query = single.query;
+    const headers = single.config.sms.endpoints.single.headers;
 
     let accessInfoReq, challengeReq, res;
     before(async () => {
@@ -154,24 +154,9 @@ describe('POST /mfa/activate', function() {
     it('forwards the information to the MFA service', () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
-      assert.deepEqual(_.omit(body, ['message']), _.omit(profile.body, ['message']), 'activation content did not match');
-      const number = body.message.substring(single.lettersToToken);
-      assert.equal(
-        profile.body.message.replace(single.token, number),
-        body.message,
-        'message with generated code did not match'
-      );
-      assert.deepEqual(
-        _.pick(challengeReq.headers, Object.keys(headers)),
-        single.profile.headers,
-        'headers are not substituted'
-      );
-      assert.deepEqual(
-        _.pick(challengeReq.query, Object.keys(query)),
-        single.profile.query,
-        'query params are not substituted'
-      );
-      assert.deepEqual(challengeReq.query, query);
+      const number = single.extractCodeFromBody(body);
+      assert.deepEqual(body, single.bodyWithCode(number));
+      compareHeaders(challengeReq.headers, headers);
     });
 
     it('answers 302 with a generated MFA session token', () => {
