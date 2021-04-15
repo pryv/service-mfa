@@ -3,6 +3,7 @@
 const errorsHandling = require('../utils/errorsHandling');
 const ApiError = errorsHandling.ApiError;
 const logger = require('@pryv/boiler').getLogger('errors');
+const { notifyAirbrake } = require('@pryv/boiler');
 
 // Error middleware.
 // NOTE: next is not used, since the request is terminated on all errors. 
@@ -41,10 +42,13 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
 
   const response = { error: publicError };
   if (meta) response.meta = meta;
-
+  error.httpStatus = error.httpStatus || 500;
   res
     .status(error.httpStatus || 500)
     .json(response);
+  if (error.httpStatus === 500) {
+    notifyAirbrake(error);
+  }
 
   logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:`, publicError);
 };

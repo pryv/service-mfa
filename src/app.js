@@ -22,7 +22,6 @@ class Application {
 
   async init() {
     this.settings = await getConfig();
-    throw new Error('I am an uncaught exception');
     this.mfaService = bootCorrectMfaService(this.settings);
     this.express = this.setupExpressApp();
     return this;
