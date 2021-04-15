@@ -32,14 +32,14 @@ describe('POST /mfa/confirm', function () {
   
     it('verifies the MFA challenge', async () => {
       assert.isDefined(verifyReq);
-      assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.body), 'verify payload not sent');
+      assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content), 'verify payload not sent');
       assert.strictEqual(verifyReq.headers['authorization'], settings.get('sms:auth'));
     });
   
     it('updates the Pryv profile with the MFA parameters', async () => {
       assert.isDefined(profileReq);
       assert.strictEqual(profileReq.headers['authorization'], session.pryvConnection.token);
-      assert.deepEqual(profileReq.body.mfa.body, session.profile.body, 'profile update not sent');
+      assert.deepEqual(profileReq.body.mfa.body, session.profile.content, 'profile update not sent');
     });
   
     it('generates and saves MFA backup codes', async () => {
@@ -115,7 +115,7 @@ describe('POST /mfa/confirm', function () {
     it('updates the Pryv profile with the MFA parameters', async () => {
       assert.isDefined(profileReq);
       assert.strictEqual(profileReq.headers['authorization'], session.pryvConnection.token);
-      assert.deepEqual(profileReq.body.mfa.body, session.profile.body);
+      assert.deepEqual(profileReq.body.mfa.body, session.profile.content);
     });
   
     it('generates and saves MFA backup codes', async () => {

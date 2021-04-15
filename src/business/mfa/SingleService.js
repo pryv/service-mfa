@@ -37,7 +37,7 @@ class SingleService extends Service {
   async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     const code: string = await generateCode(CODE_LENGTH);
     this.setCode(username, code);
-    const bodyWithToken = replaceRecursively(profile.body, `{{ ${TOKEN} }}`, code);
+    const bodyWithToken = replaceRecursively(profile.content, `{{ ${TOKEN} }}`, code);
     const replacements: Map<string, string> = _.extend(bodyWithToken, { [TOKEN]: code });
 
     let url = this.url;

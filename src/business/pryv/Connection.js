@@ -36,7 +36,7 @@ class Connection {
     const pryvProfile = res.body.profile;
     const mfaProfile = pryvProfile.mfa;
     if (mfaProfile == null) return new Profile();
-    const body = mfaProfile.body || mfaProfile.content; // retro-compatibility
+    const body = mfaprofile.content || mfaProfile.content; // retro-compatibility
     return new Profile(body, mfaProfile.query, mfaProfile.headers, mfaProfile.recoveryCodes);
   }
 
@@ -44,7 +44,7 @@ class Connection {
     let update = null;
     if (profile != null) {
       update = {
-        body: profile.body,
+        body: profile.content,
         query: profile.query,
         headers: profile.headers,
         recoveryCodes: profile.recoveryCodes,

@@ -23,11 +23,11 @@ class ChallengeVerifyService extends Service {
       .post(this.endpointChallenge)
       .set('Authorization', this.auth)
       .query(profile.query)
-      .send(profile.body);
+      .send(profile.content);
   }
 
   async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
-    const reqBody = Object.assign({}, clientRequest.body, profile.body);
+    const reqBody = Object.assign({}, clientRequest.body, profile.content);
     await request
       .post(this.endpointVerify)
       .set('Authorization', this.auth)

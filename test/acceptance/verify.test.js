@@ -26,7 +26,7 @@ describe('POST /mfa/verify', function () {
     
     it('verifies the challenge by the MFA external service', async () => {
       assert.isDefined(verifyReq);
-      assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.body));
+      assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content));
       assert.equal(verifyReq.headers['authorization'], settings.get('sms:auth'));
     });
   

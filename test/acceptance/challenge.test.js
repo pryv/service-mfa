@@ -28,7 +28,7 @@ describe('POST /mfa/challenge', function () {
   
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq);
-      assert.deepEqual(challengeReq.body, session.profile.body);
+      assert.deepEqual(challengeReq.body, session.profile.content);
       assert.strictEqual(challengeReq.headers['authorization'], auth);
     });
   
@@ -73,12 +73,13 @@ describe('POST /mfa/challenge', function () {
       config.injectTestConfig({});
     });
   
-    let challengeReq, res, profile, headers, query;
+    let challengeReq, res;
+
+    const profile = single.profile;
+    const query = single.query;
+    const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
-      session = new DummySession(app, username, single.profile);
-      profile = session.profile;
-      query = replaceRecursively(profile.query, single.authKey, single.authValue);
-      headers = replaceRecursively(profile.headers, single.authKey, single.authValue);
+      session = new DummySession(app, username, profile);
       new Mock(single.url, '', 'POST', 200, {}, (req) => challengeReq = req, query);
       res = await request
         .post(`/${username}/mfa/challenge`)
@@ -89,24 +90,9 @@ describe('POST /mfa/challenge', function () {
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       const body = challengeReq.body;
-      assert.deepEqual(_.omit(body, ['message']), _.omit(profile.body, ['message']), 'activation content did not match');
-      const number = body.message.substring(single.lettersToToken);
-      assert.equal(
-        profile.body.message.replace(single.token, number),
-        body.message,
-        'message with generated code did not match'
-      );
-      assert.deepEqual(
-        _.pick(challengeReq.headers, Object.keys(headers)),
-        single.profile.headers,
-        'headers are not substituted'
-      );
-      assert.deepEqual(
-        _.pick(challengeReq.query, Object.keys(query)),
-        single.profile.query,
-        'query params are not substituted'
-      );
-      assert.deepEqual(challengeReq.query, query);
+      const number = single.extractCodeFromBody(body);
+      assert.deepEqual(body, single.bodyWithCode(number));
+      compareHeaders(challengeReq.headers, headers);
     });
   
     it('answers 200 and asks to verify the MFA challenge', async () => {

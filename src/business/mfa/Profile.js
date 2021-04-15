@@ -4,22 +4,16 @@ const _ = require('lodash');
 
 class Profile {
 
-  body: mixed;
-  query: mixed;
-  headers: mixed;
+  content: mixed;
   recoveryCodes: Array<string>;
   
-  constructor(body: mixed = {}, query: mixed = {}, headers: mixed = {}, recoveryCodes: ?Array<string>) {
-    this.recoveryCodes = recoveryCodes || [];
-    this.body = body;
-    this.query = query;
-    this.headers = headers;
+  constructor(content: mixed = {}, recoveryCodes: Array<string> = []) {
+    this.recoveryCodes = recoveryCodes;
+    this.content = content;
   }
 
   isActive() {
-    return  ! _.isEmpty(this.body) ||
-            ! _.isEmpty(this.query) ||
-            ! _.isEmpty(this.headers);
+    return  ! _.isEmpty(this.content);
   }
 
   generateRecoveryCodes () {
