@@ -2,7 +2,7 @@
 
 /*global describe, it, before */
 
-describe('POST /login', function () {
+describe('POST /auth/login', function () {
   const username = 'testuser';
   let settings, coreEndpoint, request, loginHeaders;
 
