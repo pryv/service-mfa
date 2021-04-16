@@ -2,15 +2,16 @@
 
 describe('POST /mfa/verify', function () {
   const username = 'testuser';
-  const body = {code: '5678'};
 
   let settings, verifyEndpoint, request;
 
   describe('mode="challenge/verify"', () => {
+    const body = {phone: '5678'};
+
     before(async () => {
       await app.init();
       settings = app.settings;
-      verifyEndpoint = settings.get('sms:endpoints:verify');
+      verifyEndpoint = settings.get('sms:endpoints:verify:url');
       request = supertest(app.express);
     });
   
@@ -27,7 +28,7 @@ describe('POST /mfa/verify', function () {
     it('verifies the challenge by the MFA external service', async () => {
       assert.isDefined(verifyReq);
       assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content));
-      assert.equal(verifyReq.headers['authorization'], settings.get('sms:auth'));
+      compareHeaders(verifyReq.headers, settings.get('sms:endpoints:challenge:headers'));
     });
   
     it('clears the MFA session', async () => {
@@ -63,6 +64,7 @@ describe('POST /mfa/verify', function () {
   });
 
   describe('mode="single"', () => {
+    const body = {code: '5678'};
 
     let config;
     before(async () => {
@@ -129,7 +131,7 @@ describe('POST /mfa/verify', function () {
       res = await request
         .post(`/${username}/mfa/verify`)
         .set('Authorization', 'invalidMfaToken')
-        .send(body);
+        .send({anything: 'hi'});
     });
 
     it('returns an error', async () => {

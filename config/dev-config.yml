@@ -18,9 +18,21 @@ logs:
 core:
   url: https://co2.pryv.li
 sms:
+  mode: 'challenge-verify'  # allowed: 'challenge-verify', 'single'
   endpoints:
-    challenge: https://api.smsapi.com/mfa/codes
-    verify: https://api.smsapi.com/mfa/codes/verifications
-  auth: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+    challenge: 
+      url: 'https://api.smsapi.com/mfa/codes'
+      method: 'POST'
+      body: '{{ phoneObject }}'
+      headers:
+        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        'content-type': 'application/json'
+    verify: 
+      url: 'https://api.smsapi.com/mfa/codes/verifications'
+      method: 'POST'
+      body: '{{ phoneObject }}'
+      headers:
+        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        'content-type': 'application/json'
 sessions:
   ttlSeconds: 0.2

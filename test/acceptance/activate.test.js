@@ -15,7 +15,7 @@ describe('POST /mfa/activate', function() {
       await app.init();
       settings = app.settings;
       coreEndpoint = `${settings.get('core:url')}/${username}`;
-      challengeEndpoint = settings.get('sms:endpoints:challenge');
+      challengeEndpoint = settings.get('sms:endpoints:challenge:url');
       request = supertest(app.express);
     });
 
@@ -51,10 +51,7 @@ describe('POST /mfa/activate', function() {
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq, 'challenge not sent');
       assert.deepEqual(challengeReq.body, profileContent);
-      assert.strictEqual(
-        challengeReq.headers['authorization'],
-        settings.get('sms:auth')
-      );
+      compareHeaders(challengeReq.headers, settings.get('sms:endpoints:challenge:headers'));
     });
 
     it('answers 302 with a generated MFA session token', async () => {

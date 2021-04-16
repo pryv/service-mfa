@@ -4,23 +4,22 @@
 
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
-  const body = {code: '5678'};
   let settings, coreEndpoint, verifyEndpoint, request;
   let verifyReq, profileReq, res, session;
 
   describe('mode="challenge-verify"', () => {
-
+    const body = {phone: '5678'};
     before(async () => {
       await app.init();
       settings = app.settings;
       coreEndpoint = `${settings.get('core:url')}/${username}`;
-      verifyEndpoint = settings.get('sms:endpoints:verify');
+      verifyEndpoint = settings.get('sms:endpoints:verify:url');
       request = supertest(app.express);
     });
     
     before(async () => {
       session = new DummySession(app, username);
-  
+    
       new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => verifyReq = req);
       new Mock(coreEndpoint, '/profile/private', 'PUT', 200, {}, (req) => profileReq = req);
   
@@ -33,7 +32,7 @@ describe('POST /mfa/confirm', function () {
     it('verifies the MFA challenge', async () => {
       assert.isDefined(verifyReq);
       assert.deepEqual(verifyReq.body, Object.assign(body, session.profile.content), 'verify payload not sent');
-      assert.strictEqual(verifyReq.headers['authorization'], settings.get('sms:auth'));
+      compareHeaders(verifyReq.headers, settings.get('sms:endpoints:challenge:headers'));
     });
   
     it('updates the Pryv profile with the MFA parameters', async () => {
@@ -83,6 +82,8 @@ describe('POST /mfa/confirm', function () {
   });
 
   describe('mode="single"', () => {
+
+    const body = {code: '5678'};
 
     let config;
     before(async () => {
@@ -161,7 +162,7 @@ describe('POST /mfa/confirm', function () {
       res = await request
         .post(`/${username}/mfa/confirm`)
         .set('Authorization', 'invalidMfaToken')
-        .send({body});
+        .send({anything: 'hi'});
     });
 
     it('returns an error', async () => {

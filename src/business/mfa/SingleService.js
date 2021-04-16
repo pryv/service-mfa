@@ -50,7 +50,7 @@ class SingleService extends Service {
     }
     
 
-    await makeRequest(this.apiMethod, url, headers, body);
+    await this._makeRequest(this.apiMethod, url, headers, body);
   }
 
   async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
@@ -76,19 +76,6 @@ class SingleService extends Service {
   clearCode(username: string): void {
     this.codes.delete(username);
     clearTimeout(this.timeouts.get(username));
-  }
-}
-
-async function makeRequest(method: string, url: string, headers: Map<string, string>, body: {}): Promise<void> {
-  if (method === 'POST') {
-    return await request
-      .post(url)
-      .set(headers)
-      .send(body);
-  } else { // GET
-    return request
-      .get(url)
-      .set(headers);
   }
 }
 

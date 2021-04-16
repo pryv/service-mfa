@@ -49,6 +49,27 @@ class Service {
     return this.sessions.delete(id);
   }
 
+  /**
+   * Make a request POST or GET depending on "method"
+   * 
+   * @param {*} method 
+   * @param {*} url 
+   * @param {*} headers 
+   * @param {*} body 
+   */
+  async _makeRequest(method: string, url: string, headers: Map<string, string>, body: string): Promise<void>{
+    if (method === 'POST') {
+      return await request
+        .post(url)
+        .set(headers)
+        .send(body);
+    } else { // GET
+      return request
+        .get(url)
+        .set(headers);
+    }
+  }
+
 }
 
 module.exports = Service;

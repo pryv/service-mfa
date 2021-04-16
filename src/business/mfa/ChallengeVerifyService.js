@@ -1,38 +1,61 @@
 // @flow
 
 const request = require('superagent');
-const Service = require('./Service');
 
+const Service = require('./Service');
+const replaceRecursively = require('../../utils/replaceRecursively');
+const replaceAll = require('../../utils/replaceAll');
 import type Profile from './Profile';
 
 class ChallengeVerifyService extends Service {
 
-  auth: string;
-  endpointChallenge: string;
-  endpointVerify: string;
+  challengeUrl: string;
+  challengeMethod: string;
+  challengeHeaders: Map<string, string>;
+  challengeBody: string;
+  verifyUrl: string;
+  verifyMethod: string;
+  verifyHeaders: Map<string, string>;
+  verifyBody: string;
 
   constructor(settings: Object) {
     super(settings);
-    this.auth = settings.get('sms:auth');
-    this.endpointChallenge = settings.get('sms:endpoints:challenge');
-    this.endpointVerify = settings.get('sms:endpoints:verify');
+    this.challengeUrl = settings.get('sms:endpoints:challenge:url');
+    this.challengeMethod = settings.get('sms:endpoints:challenge:method');
+    this.challengeHeaders = settings.get('sms:endpoints:challenge:headers');
+    this.challengeBody = settings.get('sms:endpoints:challenge:body');
+    this.verifyUrl = settings.get('sms:endpoints:verify:url');
+    this.verifyMethod = settings.get('sms:endpoints:verify:method');
+    this.verifyHeaders = settings.get('sms:endpoints:verify:headers');
+    this.verifyBody = settings.get('sms:endpoints:verify:body');
   }
 
   async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
-    await request
-      .post(this.endpointChallenge)
-      .set('Authorization', this.auth)
-      .query(profile.query)
-      .send(profile.content);
+    const replacements: Map<string, string>  = profile.content;
+    let url: string = this.challengeUrl;
+    let headers: Map<string, string> = this.challengeHeaders;
+    let body: string = this.challengeBody;
+    for (const [key, value] of Object.entries(replacements)) {
+      headers = replaceRecursively(headers, `{{ ${key} }}`, value);
+      body = replaceAll(body, `{{ ${key} }}`, value);
+      url = replaceAll(url, `{{ ${key} }}`, value);
+    }
+    await this._makeRequest(this.challengeMethod, url, headers, body);
   }
 
   async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
-    const reqBody = Object.assign({}, clientRequest.body, profile.content);
-    await request
-      .post(this.endpointVerify)
-      .set('Authorization', this.auth)
-      .query(clientRequest.query)
-      .send(reqBody);
+    const replacements: Map<string, string>  = Object.assign({}, clientRequest.body, profile.content);
+
+    let url: string = this.verifyUrl;
+    let headers: Map<string, string> = this.verifyHeaders;
+    let body: string = this.verifyBody;
+    for (const [key, value] of Object.entries(replacements)) {
+      headers = replaceRecursively(headers, `{{ ${key} }}`, value);
+      body = replaceAll(body, `{{ ${key} }}`, value);
+      url = replaceAll(url, `{{ ${key} }}`, value);
+    }
+    
+    await this._makeRequest(this.verifyMethod, url, headers, body);
   }
 
 }

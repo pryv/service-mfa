@@ -4,14 +4,13 @@
 
 describe('POST /mfa/challenge', function () {
   const username = 'testuser';
-  let settings, auth, challengeEndpoint, request;
+  let settings, challengeEndpoint, request;
 
   describe('mode="challenge-verify"', () => {
     before(async () => {
       await app.init();
       settings = app.settings;
-      challengeEndpoint = settings.get('sms:endpoints:challenge');
-      auth = settings.get('sms:auth');
+      challengeEndpoint = settings.get('sms:endpoints:challenge:url');
       request = supertest(app.express);
     });
   
@@ -29,7 +28,7 @@ describe('POST /mfa/challenge', function () {
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq);
       assert.deepEqual(challengeReq.body, session.profile.content);
-      assert.strictEqual(challengeReq.headers['authorization'], auth);
+      compareHeaders(challengeReq.headers, settings.get('sms:endpoints:challenge:headers'));
     });
   
     it('answers 200 and asks to verify the MFA challenge', async () => {

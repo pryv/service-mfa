@@ -5,9 +5,28 @@ http:
 core:
   url: http://core_router:1337
 sms:
+  mode: 'challenge-verify'
   endpoints:
-    challenge: ''
-    verify: ''
-  auth: ''
+    challenge:
+      url: ''
+      method: 'POST'
+      body: '{{ phoneObject }}'
+      headers:
+        authorization: ''
+        'content-type': 'application/json'
+    verify:
+      url: ''
+      method: 'POST'
+      body: '{{ phoneObject }}'
+      headers:
+        authorization: ''
+        'content-type': 'application/json'
+    single: 
+      url: ''
+      method: 'POST'
+      body: '{{ phoneObject }}'
+      headers:
+        authorization: ''
+        'content-type': 'application/json'
 sessions:
   ttlSeconds: 1800

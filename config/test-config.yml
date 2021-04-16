@@ -15,14 +15,26 @@ core:
 sms:
   mode: 'challenge-verify'  # allowed: 'challenge-verify', 'single'
   endpoints:
-    challenge: https://api.smsapi.com/mfa/codes
-    verify: https://api.smsapi.com/mfa/codes/verifications
+    challenge: 
+      url: 'https://api.smsapi.com/mfa/codes'
+      method: 'POST'
+      body: '{"phone":"{{ phone }}"}'
+      headers:
+        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        'content-type': 'application/json'
+    verify: 
+      url: 'https://api.smsapi.com/mfa/codes/verifications'
+      method: 'POST'
+      body: '{"phone":"{{ phone }}"}'
+      headers:
+        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        'content-type': 'application/json'
     # single: 
-    #   url: https://api.smsmode.com/http/1.6/sendSMS.do
+    #   url: https://api.smsmode.com/http/1.6/sendSMS.do?phoneNumber={{ phoneNumber }}&auth=MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls
     #   method: 'POST'
-  auth: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
-  #token: '{{ code }}'
-  #variables:
-  #  authorization: 'MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls'
+    #   body: '{"phoneNumber":"{{ phoneNumber }}","message":"{{ message }}"}'
+    #   headers:
+    #     authorization: authValue
+    #     'content-type': 'application/json'
 sessions:
   ttlSeconds: 0.2
