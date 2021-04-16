@@ -122,6 +122,47 @@ describe('POST /mfa/challenge', function () {
     });
   });
 
+  describe('mode="single" and method="GET"', () => {
+    let config;
+    before(async () => {
+      config = await getConfig();
+      const configWithGet = _.cloneDeep(single.config);
+      configWithGet.sms.endpoints.single.method = 'GET';
+      config.injectTestConfig(configWithGet);
+      await app.init();
+      settings = app.settings;
+      request = supertest(app.express);
+    });
+    after(() => {
+      config.injectTestConfig({});
+    });
+  
+    let challengeReq, res;
+
+    const profile = single.profile;
+    const query = single.query;
+    const headers = single.config.sms.endpoints.single.headers;
+    before(async () => {
+      session = new DummySession(app, username, profile);
+      new Mock(single.url, '', 'GET', 200, {}, (req) => challengeReq = req, query);
+      res = await request
+        .post(`/${username}/mfa/challenge`)
+        .set('Authorization', session.mfaToken)
+        .send();
+    });
+  
+    it('triggers the MFA challenge', async () => {
+      assert.isDefined(challengeReq, 'challenge request was not sent');
+      compareHeaders(challengeReq.headers, headers);
+    });
+  
+    it('answers 200 and asks to verify the MFA challenge', async () => {
+      assert.strictEqual(res.status, 200);
+      assert.strictEqual(res.body.message, 'Please verify the MFA challenge.');
+    });
+  
+  });
+
   describe('when the MFA session token is invalid', function () {
 
     let res;
