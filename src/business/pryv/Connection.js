@@ -1,7 +1,9 @@
 // @flow
 
 const request = require('superagent');
+
 const Profile = require('../mfa/Profile');
+const { factory } = require('../../utils/errorsHandling');
 
 const PERSONAL_ACCESS_TYPE = 'personal';
 
@@ -60,9 +62,7 @@ class Connection {
       .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
     if (res.body.type !== PERSONAL_ACCESS_TYPE) {
-      const error = new Error('You cannot access this resource using the given access token.');
-      error.id = 'forbidden';
-      error.status = 403;
+      const error = factory.unauthorized('You cannot access this resource using the given access token.')
       throw error;
     }
   }
