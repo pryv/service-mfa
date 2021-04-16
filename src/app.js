@@ -30,6 +30,8 @@ class Application {
   setupExpressApp(): express$Application {
     const expressApp = express();
 
+    expressApp.disable('x-powered-by');
+
     expressApp.use(express.json());
     expressApp.use(middlewares.subdomainToPath);
     expressApp.use(middlewares.commonHeaders);
