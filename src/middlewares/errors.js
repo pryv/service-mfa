@@ -50,5 +50,5 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
     notifyAirbrake(error);
   }
 
-  logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:`, publicError);
+  logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:` + JSON.stringify(publicError,null));
 };
