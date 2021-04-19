@@ -1,10 +1,10 @@
 const qs = require('querystring');
 
 const url = 'https://api.smsmode.com/http/1.6/sendSMS.do';
-const token = '{{ token }}';
-const message = 'Hi, here is your MFA code: ' + token;
-const messageWithCode = (code) => message.replace(token, code);
-const lettersToToken = message.indexOf(token)
+const code = '{{ code }}';
+const message = 'Hi, here is your MFA code: ' + code;
+const messageWithCode = (replace) => message.replace(code, replace);
+const lettersToToken = message.indexOf(code)
 const extractCodeFromBody = (body) => body.message.substring(lettersToToken);
 const phoneNumber = '1234';
 
@@ -18,7 +18,7 @@ const body = {phoneNumber: '{{ phoneNumber }}', message: '{{ message }}'};
 
 module.exports = {
   url: `${url}?${query}`,
-  token,
+  code,
   message,
   messageWithCode,
   bodyWithCode: (code) => { return { phoneNumber, message: messageWithCode(code) }; },

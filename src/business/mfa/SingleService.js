@@ -10,7 +10,7 @@ const replaceAll = require('../../utils/replaceAll');
 import type Profile from './Profile';
 
 const CODE_LENGTH = 4;
-const TOKEN = 'token';
+const CODE = 'code';
 
 class SingleService extends Service {
 
@@ -37,8 +37,8 @@ class SingleService extends Service {
   async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     const code: string = await generateCode(CODE_LENGTH);
     this.setCode(username, code);
-    const bodyWithToken = replaceRecursively(profile.content, `{{ ${TOKEN} }}`, code);
-    const replacements: Map<string, string> = _.extend(bodyWithToken, { [TOKEN]: code });
+    const bodyWithToken = replaceRecursively(profile.content, `{{ ${CODE} }}`, code);
+    const replacements: Map<string, string> = _.extend(bodyWithToken, { [CODE]: code });
 
     let url = this.url;
     let headers = this.headers;
@@ -79,6 +79,6 @@ class SingleService extends Service {
   }
 }
 
-SingleService.TOKEN = TOKEN;
+SingleService.CODE = CODE;
 
 module.exports = SingleService;

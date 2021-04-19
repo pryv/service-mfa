@@ -188,7 +188,7 @@ describe('POST /mfa/activate', function() {
     });
   });
 
-  describe('when the provide token is not personal', () => {
+  describe('when the provided token is not personal', () => {
     before(async () => {
       await app.init();
     });

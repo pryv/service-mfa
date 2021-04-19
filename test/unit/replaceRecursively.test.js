@@ -8,9 +8,9 @@ describe('replaceRecursively', () => {
     const token = '{{ code }}';
     const code = '123';
     const object = {
-      a: 'blabla ' + token,
+      a: 'blabla ' + code,
       b: {
-        c: 'blibli ' + token,
+        c: 'blibli ' + code,
         d: 1,
       },
       e: 2,
