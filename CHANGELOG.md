@@ -1,5 +1,10 @@
 ## 1.0
 
+### 1.0.3
+
+- Implement single mode
+- Refactor how templating works, see new MFA guide
+
 ### 1.0.2
 
 - Fix response: now forwarding all fields from core
