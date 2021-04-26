@@ -23,7 +23,7 @@ describe('POST /auth/login', function () {
   };
   const pryvToken = 'pryvToken';
   const profileContent = {
-    phone: '1234'
+    phone_number: '1234'
   };
 
   describe('when MFA is not activated', function () {

@@ -9,7 +9,7 @@ describe('POST /mfa/activate', function() {
 
   describe('mode="challenge-verify"', () => {
     const profileContent = {
-      phone: '1234'
+      phone_number: '1234'
     };
     before(async () => {
       await app.init();
