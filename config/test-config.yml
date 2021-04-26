@@ -25,7 +25,7 @@ sms:
     verify: 
       url: 'https://api.smsapi.com/mfa/codes/verifications'
       method: 'POST'
-      body: '{"phone":"{{ phone }}"}'
+      body: '{"phone":"{{ phone }}","code":"{{ code }}"}'
       headers:
         authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
         'content-type': 'application/json'

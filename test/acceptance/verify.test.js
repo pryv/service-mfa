@@ -6,7 +6,7 @@ describe('POST /mfa/verify', function () {
   let settings, verifyEndpoint, request;
 
   describe('mode="challenge/verify"', () => {
-    const body = {phone: '5678'};
+    const body = {code: '1234'};
 
     before(async () => {
       await app.init();
