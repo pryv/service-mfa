@@ -8,7 +8,7 @@ describe('POST /mfa/confirm', function () {
   let verifyReq, profileReq, res, session;
 
   describe('mode="challenge-verify"', () => {
-    const body = {phone: '5678'};
+    const body = {code: '1234'};
     before(async () => {
       await app.init();
       settings = app.settings;
