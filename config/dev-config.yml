@@ -23,16 +23,19 @@ sms:
     challenge: 
       url: 'https://api.smsapi.com/mfa/codes'
       method: 'POST'
-      body: '{{ phoneObject }}'
+      body: '{"phone_number":"{{ phone_number }}"}'
       headers:
-        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        authorization: 'Bearer TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
         'content-type': 'application/json'
     verify: 
       url: 'https://api.smsapi.com/mfa/codes/verifications'
       method: 'POST'
-      body: '{{ phoneObject }}'
+      body: '{"phone_number":"{{ phone_number }}","code":"{{ code }}"}'
       headers:
-        authorization: 'Bearer: TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
+        authorization: 'Bearer TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
         'content-type': 'application/json'
+    single: 
+      url: https://api.smsmode.com/http/1.6/sendSMS.do?accessToken=MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls&message={{ code }}&emetteur=Pryv%20Lab&numero={{ phone_number }}
+      method: 'GET'
 sessions:
   ttlSeconds: 0.2
