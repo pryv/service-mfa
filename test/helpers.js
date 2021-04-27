@@ -14,6 +14,7 @@ function compareHeaders (allHeaders, headersToFind) {
 Object.assign(global, {
   _,
   assert,
+  Application: Application,
   app: new Application(),
   Mock: require('./fixture/Mock'),
   DummySession: require('./fixture/DummySession'),

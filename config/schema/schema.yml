@@ -1,0 +1,35 @@
+id: mfaObject
+type: object
+properties:
+  mode:
+    id: mfaMode
+    type: string
+    enum:
+      - single
+      - challenge-verify
+  endpoints:
+    single:
+      url:
+        id: singleEndpointUrl
+        type: uri
+      method:
+        id: singleEndpointMethod
+        type: string
+        enum:
+          - POST
+          - GET
+      body:
+        id: singleEndpointBody
+        type: string
+      headers:
+        id: singleEndpointHeaders
+        type: object
+        properties:
+    challenge:
+    verify:
+    anyOf:
+      - required:
+          - single
+      - required:
+          - challenge
+          - verify

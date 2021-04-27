@@ -2,7 +2,11 @@
 const path = require('path');
 const { getConfig } = require('@pryv/boiler').init({
   appName: 'service-mfa',
-  baseConfigDir: path.resolve(__dirname, '../config/')
+  baseConfigDir: path.resolve(__dirname, '../config/'),
+  extraConfigs: [{
+    scope: 'validation',
+    plugin: require(path.resolve(__dirname, '../config/validation.js')),
+  }],
 });
 
 
