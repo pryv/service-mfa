@@ -15,7 +15,9 @@
     "@pryv/boiler": "https://github.com/pryv/lib-node-boiler.git",
     "bluebird": "^3.7.2",
     "express": "^4.17.1",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "yaml": "^1.10.2",
+    "z-schema": "^5.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
