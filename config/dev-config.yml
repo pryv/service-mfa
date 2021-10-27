@@ -11,6 +11,9 @@ logs:
   file:
     active: true
     path: mfa.log
+    isRotated: true
+    rotation:
+      days: 12
   airbrake:
     active: true
     projectId: 329486
