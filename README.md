@@ -12,6 +12,7 @@ Prerequisites: Node v8+, Yarn v1+
 | Run API server                    | `yarn start`                   |
 | Run Tests                         | `yarn test`                    |
 | Create Distribution               | `yarn release`                 |
+| Watch Distribution                | `yarn watch`                   |
 
 ## Configuration
 
