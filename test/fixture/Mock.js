@@ -5,10 +5,11 @@ const querystring = require('querystring');
 
 class Mock {
 
-  constructor(endpoint: string, path: string, method: string, status: number, res: Object, cb?: (Object) => void, query?: mixed) {
+  constructor(endpoint: string, path: string, method: string, status: number, res: Object, cb?: (Object) => void, query?: mixed, times: number =1) {
     nock(endpoint)
       .intercept(path, method)
       .query(query)
+      .times(times)
       .reply(function (uri, requestBody) {
         if (typeof cb === 'function') {
           cb(Object.assign({}, 

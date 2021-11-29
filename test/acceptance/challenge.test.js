@@ -72,31 +72,48 @@ describe('POST /mfa/challenge', function () {
       config.injectTestConfig({});
     });
   
-    let challengeReq, res;
+    let challengeReqs = [], res, res2, codes = [], session;
 
     const profile = single.profile;
     const query = single.query;
     const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
       session = new DummySession(app, username, profile);
-      new Mock(single.url, '', 'POST', 200, {}, (req) => challengeReq = req, query);
+      new Mock(single.url, '', 'POST', 200, {}, (req) => challengeReqs.push(req), query, 2);
       res = await request
+        .post(`/${username}/mfa/challenge`)
+        .set('Authorization', session.mfaToken)
+        .send();
+      res2 = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
     });
   
-    it('triggers the MFA challenge', async () => {
-      assert.isDefined(challengeReq, 'challenge request was not sent');
-      const body = challengeReq.body;
-      const number = single.extractCodeFromBody(body);
-      assert.deepEqual(body, single.bodyWithCode(number));
-      compareHeaders(challengeReq.headers, headers);
+    it('triggers the MFA challenge', () => {
+      assert.isDefined(challengeReqs[0], 'challenge request was not sent');
+      const body = challengeReqs[0].body;
+      const code = single.extractCodeFromBody(body);
+      codes.push(code);
+      assert.deepEqual(body, single.bodyWithCode(code));
+      compareHeaders(challengeReqs[0].headers, headers);
     });
-  
-    it('answers 200 and asks to verify the MFA challenge', async () => {
+    it('answers 200 and asks to verify the MFA challenge', () => {
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.message, 'Please verify the MFA challenge.');
+    });
+    it('generates different codes', () => {
+      const body = challengeReqs[1].body;
+      const code = single.extractCodeFromBody(body);
+      assert.notEqual(code, codes[0]);
+    });
+    it('accepts them', async () => {
+      challengeReqs = challengeReqs.map(req => single.extractCodeFromBody(req.body));
+      const res3 = await request
+        .post(`/${username}/mfa/verify`)
+        .set('Authorization', session.mfaToken)
+        .send({ code: challengeReqs[challengeReqs.length - 1]});
+      assert.equal(res3.status, 200);
     });
   
     describe('when the MFA challenge could not be triggered', function () {
