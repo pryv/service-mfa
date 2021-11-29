@@ -30,16 +30,22 @@ class SingleService extends Service {
     this.apiMethod = settings.get('sms:endpoints:single:method');
     this.headers = settings.get('sms:endpoints:single:headers');
     this.body = settings.get('sms:endpoints:single:body');
+
+    /**
+     * username -> code
+     */
     this.codes = new Map();
+    /**
+     * username -> timeout
+     */
     this.timeouts = new Map();
   }
 
   async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
     const code: string = await generateCode(CODE_LENGTH);
     this.setCode(username, code);
-    const bodyWithToken = replaceRecursively(profile.content, `{{ ${CODE} }}`, code);
+    const bodyWithToken = replaceRecursively(_.cloneDeep(profile.content), `{{ ${CODE} }}`, code);
     const replacements: Map<string, string> = _.extend(bodyWithToken, { [CODE]: code });
-
     let url = this.url;
     let headers = this.headers;
     let body = this.body;
@@ -48,7 +54,6 @@ class SingleService extends Service {
       body = replaceAll(body, `{{ ${key} }}`, value);
       url = replaceAll(url, `{{ ${key} }}`, value);
     }
-    
 
     await this._makeRequest(this.apiMethod, url, headers, body);
   }
