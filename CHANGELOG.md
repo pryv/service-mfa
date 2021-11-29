@@ -1,5 +1,13 @@
 ## 1.0
 
+### 1.1.2
+
+- Fix issue on single mode where the code that had been used for activation is actually hardcoded in the profile, overwriting the {{ code }} variable.
+
+### 1.1.1
+
+- Add log rotation
+
 ### 1.1.0
 
 - Implement single mode
