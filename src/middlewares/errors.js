@@ -9,7 +9,7 @@ const { notifyAirbrake } = require('@pryv/boiler');
 // NOTE: next is not used, since the request is terminated on all errors. 
 /*eslint-disable no-unused-vars*/
 module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
-  logger.info('Error with message: ' + error.message, 'response:', error.response);
+  logger.error('Error with message: ' + error.message, 'response:', error.response);
 
   let meta;
   if (! (error instanceof ApiError)) {
@@ -23,7 +23,7 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
         message = errorBody.error.message;
       }
       meta = errorBody.meta;
-      errorId = errorBody.error.id;
+      if (errorBody.error != null) errorId = errorBody.error.id;
     }
     if (message == null && error.message != null) message = error.message;
     if (message == null) message = error.toString();
