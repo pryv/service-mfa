@@ -6,6 +6,7 @@ const Session = require('./Session');
 import type PryvConnection from '../pryv/Connection';
 import type Profile from './Profile';
 const {getLogger} = require('@pryv/boiler');
+const { ApiError } = require('../../utils/errorsHandling');
 
 class Service {
 
@@ -58,15 +59,26 @@ class Service {
    * @param {*} body 
    */
   async _makeRequest(method: string, url: string, headers: Map<string, string>, body: string): Promise<void>{
-    if (method === 'POST') {
-      return await request
-        .post(url)
-        .set(headers)
-        .send(body);
-    } else { // GET
-      return request
-        .get(url)
-        .set(headers);
+    try {
+      if (method === 'POST') {
+        return await request
+          .post(url)
+          .set(headers)
+          .send(body);
+      } else { // GET
+        return request
+          .get(url)
+          .set(headers);
+      }
+    } catch (error) {
+      this.logger.error(`Error while sending ${method} request to ${url} with headers ${JSON.stringify(headers)} and body: ${JSON.stringify(body)}.`);
+      if (error.response) this.logger.error(`Service response: ${JSON.stringify(error.response.body)}`);
+
+      throw new ApiError(
+        400,
+        `Error from messaging service. Error message: "${error.message}"`,
+        'messaging-server-error',
+      );
     }
   }
 

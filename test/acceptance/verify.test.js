@@ -56,9 +56,9 @@ describe('POST /mfa/verify', function () {
           .send({code: 'invalidCode'});
       });
   
-      it('returns the MFA external service error', async () => {
-        assert.equal(res.status, 404);
-        assert.equal(res.body.error.message, serviceError.error.message);
+      it('returns a messaging service error', async () => {
+        assert.strictEqual(res.status, 400);
+        assert.equal(res.body.error.id, 'messaging-server-error')
       });
     });
   });

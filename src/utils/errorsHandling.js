@@ -6,13 +6,13 @@ class ApiError extends Error {
 
   httpStatus: number;
   message: string;
-  id: ?string;
+  id: string;
 
-  constructor(status: number, msg: string, id: ?string) {
+  constructor(status: number, msg: string, id: string = 'unexpected-error') {
     super(msg);
     this.httpStatus = status;
     this.message = msg;
-    this.id = id || 'unexpected-error';
+    this.id = id;
   }
 
   getPublicErrorData() {

@@ -73,10 +73,10 @@ describe('POST /mfa/confirm', function () {
           .set('Authorization', mfaToken)
           .send({code: 'invalidCode'});
       });
-  
-      it('returns the MFA external service error', async () => {
-        assert.strictEqual(res.status, 400, 'service response status not transmitted');
-        assert.strictEqual(res.body.error.message, serviceError.error.message, 'service error message not transmitted');
+
+      it('returns a messaging service error', async () => {
+        assert.strictEqual(res.status, 400);
+        assert.equal(res.body.error.id, 'messaging-server-error')
       });
     });
   });

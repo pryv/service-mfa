@@ -52,9 +52,9 @@ describe('POST /mfa/challenge', function () {
           .send({});
       });
   
-      it('returns the MFA external service error', async () => {
+      it('returns a messaging service error', async () => {
         assert.strictEqual(res.status, 400);
-        assert.strictEqual(res.body.error.message, serviceError.error.message);
+        assert.equal(res.body.error.id, 'messaging-server-error')
       });
     });
   });
@@ -132,9 +132,9 @@ describe('POST /mfa/challenge', function () {
           .send({});
       });
   
-      it('returns the MFA external service error', async () => {
+      it('returns a messaging service error', async () => {
         assert.strictEqual(res.status, 400);
-        assert.strictEqual(res.body.error.message, serviceError.error.message);
+        assert.equal(res.body.error.id, 'messaging-server-error')
       });
     });
   });

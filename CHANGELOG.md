@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.1.3
+
+- Handle messaging service error correctly
+
 ### 1.1.2
 
 - Fix issue on single mode where the code that had been used for activation is actually hardcoded in the profile, overwriting the {{ code }} variable.
