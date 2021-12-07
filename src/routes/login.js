@@ -10,12 +10,10 @@ module.exports = function (expressApp: express$Application, settings: Object, mf
   // POST /login: proxied Pryv login
   expressApp.post('/:username/login',
     async (req: express$Request, res: express$Response, next: express$NextFunction) => {
-      console.log('got a login');
       try {
         const username = req.params.username;
         const pryvConnection = new PryvConnection(settings, username, null);
         await pryvConnection.login(req);
-        console.log('logged in')
         const mfaProfile = await pryvConnection.fetchProfile(req);
 
         if (mfaProfile.isActive()) {
