@@ -1,5 +1,9 @@
 ## 1.0
 
+### 1.1.4
+
+- increase username characters limit to 60 (which was done in core, but not here)
+
 ### 1.1.3
 
 - Handle messaging service error correctly
