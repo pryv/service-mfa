@@ -26,8 +26,14 @@ module.exports = function (req: express$Request, res: express$Response, next: ex
   next();
 };
 
+const USERNAME_MIN_LENGTH = 5;
+const USERNAME_MAX_LENGTH = 60;
+const USERNAME_REGEXP_STR = '^[a-z0-9]' +
+                            '[a-z0-9-]{' + (USERNAME_MIN_LENGTH - 2) + ',' + (USERNAME_MAX_LENGTH - 2) + '}' + 
+                            '[a-z0-9]$';
+
 function looksLikeUsername(candidate: string): boolean {
-  const reUsername = /^([a-zA-Z0-9])(([a-zA-Z0-9-]){3,21})[a-zA-Z0-9]$/; 
-  
-  return reUsername.test(candidate);
+  const reUsername = new RegExp(USERNAME_REGEXP_STR); 
+  const lowercasedUsername = candidate.toLowerCase(); // for retro-compatibility
+  return reUsername.test(lowercasedUsername);
 }
