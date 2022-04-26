@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+# TODO: just lint
+just license
