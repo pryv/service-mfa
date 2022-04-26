@@ -1,22 +1,43 @@
-# Service-mfa
+# service-mfa
 
 A service for adding multi-factor authentication on top of Pryv.io login calls.
 
-Prerequisites: Node v8+, Yarn v1+
 
-## How to?
+## Installation
 
-| Task                              | Command                        |
-| --------------------------------- | ------------------------------ |
-| Setup                             | `yarn install`                 |
-| Run API server                    | `yarn start`                   |
-| Run Tests                         | `yarn test`                    |
-| Create Distribution               | `yarn release`                 |
-| Watch Distribution                | `yarn watch`                   |
+Prerequisites: [Node.js](https://nodejs.org/en/download/) 16, [just](https://github.com/casey/just#installation)
+
+Then:
+1. `just setup-dev-env`
+2. `just install` to install node modules
+3. `just compile-dev` for the initial code compilation into `dist`
+
+Running `just` with no argument displays the available commands (defined in `justfile`).
+
+
+## Flowtype transpilation
+
+```
+just compile-(release|dev|watch)
+```
+at least once before running the server or tests, to transpile the source code from Flowtype to pure JS (the compiled code is in `dist/`).
+- `just compile-release` by default
+- `just compile-dev` to include source maps
+- `just compile-watch` to recompile all files after each saved change. Look out for compilation errors that might prevent the distribution from being updated.
+
+
+## Testing
+
+```
+just test [...params]
+```
+- Extra parameters at the end are passed on to [Mocha](https://mochajs.org/) (default settings are defined in `.mocharc.js`)
+- Replace `test` with `test-detailed`, `test-debug`, `test-cover` for common presets
+
 
 ## Configuration
 
-Here is a documented default configuration for this service: 
+Here is a documented default configuration for this service:
 
 ```yml
   http: {
@@ -51,6 +72,7 @@ Here is a documented default configuration for this service:
     ttlSeconds: 1800 // Duration in seconds after which sessions are destroyed
   }
 ```
+
 
 ## API routes
 
