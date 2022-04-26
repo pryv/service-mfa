@@ -1,12 +1,11 @@
 module.exports = {
-  diff: true,
-  extension: ['js'],
-  opts: false,
-  package: './package.json',
-  reporter: 'spec',
+  exit: true,
   slow: 75,
   timeout: 2000,
-  require: 'test/helpers.js',
   ui: 'bdd',
-  'watch-files': ['test/**/*.js']
+  diff: true,
+  reporter: 'dot',
+  spec: 'test/**/*.test.js',
+  'watch-files': ['test/**/*.js'],
+  require: ['babel-core/register', 'test/helpers.js']
 };

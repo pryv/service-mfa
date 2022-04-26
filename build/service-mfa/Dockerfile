@@ -15,8 +15,8 @@ WORKDIR $TARGET_DIR
 
 # Skipping this as it's done in GitHub workflow
 # Perform a release build of the source code. (-> dist)
-#RUN yarn install
-#RUN yarn release > /dev/null
+#RUN just install
+#RUN just compile-release > /dev/null
 
 # Copy config file
 RUN mkdir -p $CONF_DIR && \
@@ -33,7 +33,7 @@ RUN cp -r $TARGET_DIR/build/$COMPONENT_NAME/runit/* /etc/runit/
 RUN mv /etc/runit/runit.sh /etc/init.d/
 
 # make a link to /etc/service (will be run with runit).
-RUN ln -s /etc/init.d/runit.sh /etc/service/runit/run 
+RUN ln -s /etc/init.d/runit.sh /etc/service/runit/run
 # ============================ end runit ================================
 
 # Remove cron and sshd entirely, unless we use them
@@ -41,7 +41,7 @@ RUN rm -r /etc/service/cron
 RUN rm -r /etc/service/sshd && rm /etc/my_init.d/00_regen_ssh_host_keys.sh
 
 # Clean up after ourselves.
-RUN apt-get remove -y autoconf automake 
+RUN apt-get remove -y autoconf automake
 RUN apt-get autoremove && apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* & rm -rf /app/bin/build
 

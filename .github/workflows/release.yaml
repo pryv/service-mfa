@@ -1,16 +1,22 @@
-name: Pryv.io MFA release
+name: Service MFA publish release
 
-on: 
+on:
   push:
     tags:
       - '*'
 
 jobs:
   release:
-
     runs-on: ubuntu-latest
-    
+
+    strategy:
+      matrix:
+        node-version: [16.4.1]
+
     steps:
+    - name: Install `just`
+      uses: extractions/setup-just@v1
+
     - name: Download master branch
       uses: actions/checkout@v2
 
@@ -19,14 +25,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: yarn install
-      run: yarn install
-      
-    - name: yarn release
-      run: yarn release
-        
-    - name: yarn test
-      run: yarn test
+    - name: Install dependencies
+      run: just install-stable
+
+    - name: Compile for release
+      run: just compile-release
 
     - name: Login to the docker containers registry
       uses: azure/docker-login@v1
