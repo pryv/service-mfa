@@ -118,3 +118,8 @@ Verify the MFA challenge.
 
 `Response`:
   - 200 {token: 'pryvPersonalToken'}
+
+
+## License
+
+[UNLICENSED](LICENSE)
