@@ -1,49 +1,74 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const request = require('superagent');
 const Session = require('./Session');
-
-import type PryvConnection from '../pryv/Connection';
-import type Profile from './Profile';
-const {getLogger} = require('@pryv/boiler');
+const { getLogger } = require('@pryv/boiler');
 const { ApiError } = require('../../utils/errorsHandling');
 
 class Service {
+  logger = undefined;
+  /**
+   * @type {number}
+   */
+  ttlMilliseconds = undefined;
+  /**
+   * @type {Map<string, Session>}
+   */
+  sessions = undefined;
 
-  logger: mixed;
-  ttlMilliseconds: number;
-  sessions: Map<string, Session>;
-
-  constructor(settings: Object) {
+  constructor (settings) {
     this.ttlMilliseconds = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
     this.logger = getLogger('mfaService');
   }
 
-  async challenge(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
+  /**
+   * @param {string} username
+   * @param {Profile} profile
+   * @param {express$Request} clientRequest
+   * @returns {Promise<void>}
+   */
+  async challenge (username, profile, clientRequest) {
     throw new Error('override this method in a Service extension');
   }
 
-  async verify(username: string, profile: Profile, clientRequest: express$Request): Promise<void> {
+  /**
+   * @param {string} username
+   * @param {Profile} profile
+   * @param {express$Request} clientRequest
+   * @returns {Promise<void>}
+   */
+  async verify (username, profile, clientRequest) {
     throw new Error('override this method in a Service extension');
   }
 
-  hasSession(id: string): boolean {
+  /**
+   * @param {string} id
+   * @returns {boolean}
+   */
+  hasSession (id) {
     return this.sessions.has(id);
   }
 
-  getSession(id: string): ?Session {
+  /**
+   * @param {string} id
+   * @returns {any}
+   */
+  getSession (id) {
     return this.sessions.get(id);
   }
 
-  saveSession(profile: Profile, pryvConnection: PryvConnection): string {
-    this.logger.info('saving session for ' + pryvConnection.username)
+  /**
+   * @param {Profile} profile
+   * @param {PryvConnection} pryvConnection
+   * @returns {string}
+   */
+  saveSession (profile, pryvConnection) {
+    this.logger.info('saving session for ' + pryvConnection.username);
     const newSession = new Session(profile, pryvConnection);
     this.sessions.set(newSession.id, newSession);
     setTimeout(() => {
@@ -52,42 +77,48 @@ class Service {
     return newSession.id;
   }
 
-  clearSession(id: string): boolean {
+  /**
+   * @param {string} id
+   * @returns {boolean}
+   */
+  clearSession (id) {
     return this.sessions.delete(id);
   }
 
   /**
    * Make a request POST or GET depending on "method"
-   * 
-   * @param {*} method 
-   * @param {*} url 
-   * @param {*} headers 
-   * @param {*} body 
+   *
+   * @param {string} method  undefined
+   * @param {string} url  undefined
+   * @param {Map<string, string>} headers  undefined
+   * @param {string} body  undefined
+   * @returns {Promise<void>}
    */
-  async _makeRequest(method: string, url: string, headers: Map<string, string>, body: string): Promise<void>{
+  async _makeRequest (method, url, headers, body) {
     try {
       if (method === 'POST') {
-        return await request
-          .post(url)
-          .set(headers)
-          .send(body);
-      } else { // GET
-        return request
-          .get(url)
-          .set(headers);
+        return await request.post(url).set(headers).send(body);
+      } else {
+        // GET
+        return request.get(url).set(headers);
       }
     } catch (error) {
-      this.logger.error(`Error while sending ${method} request to ${url} with headers ${JSON.stringify(headers)} and body: ${JSON.stringify(body)}.`);
-      if (error.response) this.logger.error(`Service response: ${JSON.stringify(error.response.body)}`);
-
+      this.logger.error(
+        `Error while sending ${method} request to ${url} with headers ${JSON.stringify(
+          headers
+        )} and body: ${JSON.stringify(body)}.`
+      );
+      if (error.response) {
+        this.logger.error(
+          `Service response: ${JSON.stringify(error.response.body)}`
+        );
+      }
       throw new ApiError(
         400,
         `Error from messaging service. Error message: "${error.message}"`,
-        'messaging-server-error',
+        'messaging-server-error'
       );
     }
   }
-
 }
-
 module.exports = Service;

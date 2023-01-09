@@ -1,26 +1,33 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
-const uuidv4 = require('uuid/v4');
-
-import type PryvConnection from '../pryv/Connection';
-import type Profile from './Profile';
+const { v4: uuidv4 } = require('uuid');
 
 class Session {
-  id: string;
-  profile: Profile;
-  pryvConnection: PryvConnection;
+  /**
+   * @type {string}
+   */
+  id = undefined;
+  /**
+   * @type {Profile}
+   */
+  profile = undefined;
+  /**
+   * @type {PryvConnection}
+   */
+  pryvConnection = undefined;
 
-  constructor(profile: Profile, pryvConnection: PryvConnection) {
+  /**
+   * @param {Profile} profile
+   * @param {PryvConnection} pryvConnection
+   */
+  constructor (profile, pryvConnection) {
     this.id = uuidv4();
     this.profile = profile;
     this.pryvConnection = pryvConnection;
   }
 }
-
 module.exports = Session;

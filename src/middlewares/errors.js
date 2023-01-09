@@ -1,24 +1,29 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const errorsHandling = require('../utils/errorsHandling');
 const ApiError = errorsHandling.ApiError;
 const logger = require('@pryv/boiler').getLogger('errors');
 const { notifyAirbrake } = require('@pryv/boiler');
 
-// Error middleware.
-// NOTE: next is not used, since the request is terminated on all errors. 
-/*eslint-disable no-unused-vars*/
-module.exports = (error: Error | ApiError, req: express$Request, res: express$Response, next: express$NextFunction) => {
-  logger.error('Error with message: ' + error.message, 'response:', error.response);
-
+/**
+ * Error middleware.
+ * NOTE: next is not used, since the request is terminated on all errors.
+ * @param {express$Request} req
+ * @param {express$Response} res
+ * @param {express$NextFunction} next
+ */
+module.exports = (error, req, res, next) => { // eslint-disable-line no-unused-vars
+  logger.error(
+    'Error with message: ' + error.message,
+    'response:',
+    error.response
+  );
   let meta;
-  if (! (error instanceof ApiError)) {
+  if (!(error instanceof ApiError)) {
     let message;
     let errorId;
     if (error.response != null && error.response.body != null) {
@@ -33,9 +38,9 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
     }
     if (message == null && error.message != null) message = error.message;
     if (message == null) message = error.toString();
-    
+
     if (error.id != null) errorId = error.id;
-    
+
     let status;
     if (error.response != null) {
       status = error.response.statusCode || error.response.status;
@@ -49,12 +54,13 @@ module.exports = (error: Error | ApiError, req: express$Request, res: express$Re
   const response = { error: publicError };
   if (meta) response.meta = meta;
   error.httpStatus = error.httpStatus || 500;
-  res
-    .status(error.httpStatus || 500)
-    .json(response);
+  res.status(error.httpStatus || 500).json(response);
   if (error.httpStatus === 500) {
     notifyAirbrake(error);
   }
 
-  logger.error(`${req.method} ${req.url} ${res.statusCode}. Error:` + JSON.stringify(publicError,null));
+  logger.error(
+    `${req.method} ${req.url} ${res.statusCode}. Error:` +
+      JSON.stringify(publicError, null)
+  );
 };

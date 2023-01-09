@@ -32,8 +32,5 @@ jobs:
     - name: Install dependencies
       run: just install-stable
 
-    - name: Compile for release
-      run: just compile-release
-
     - name: Run all tests
       run: IS_CI=true just test

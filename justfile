@@ -17,26 +17,13 @@ setup-dev-env:
 install *params: clean
     npm install {{params}}
 
-# Clean up dist and node modules
+# Clean up node modules
 clean:
-    rm -rf dist
     rm -rf node_modules
 
 # Install node modules strictly as specified (typically for CI)
 install-stable:
     npm ci
-
-# Compile code to dist for dev (with source maps)
-compile-dev:
-    babel src/ --out-dir=dist --source-maps both
-
-# Compile code to dist for dev, then watch and recompile on changes
-compile-watch:
-    babel src/ --verbose --watch --out-dir=dist --source-maps both
-
-# Compile code to dist for release
-compile-release:
-    babel src/ --out-dir=dist
 
 # –––––––––––––----------------------------------------------------------------
 # Run
@@ -44,11 +31,15 @@ compile-release:
 
 # Start the server
 start:
-    NODE_ENV=development babel-node src/server.js
+    NODE_ENV=development node src/server.js
 
 # –––––––––––––----------------------------------------------------------------
 # Test & related
 # –––––––––––––----------------------------------------------------------------
+
+# Run code linting
+lint *options:
+    eslint {{options}} .
 
 # Run tests with optional extra parameters
 test *params:
@@ -69,10 +60,6 @@ test-cover component *params:
 # –––––––––––––----------------------------------------------------------------
 # Misc. utils
 # –––––––––––––----------------------------------------------------------------
-
-# Generate Flow.js coverage report
-flow-cover:
-    flow-coverage-report -i 'components/**/*.js' -t html
 
 # Run source licensing tool (see 'licensing' folder for details)
 license:

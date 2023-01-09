@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
@@ -13,21 +13,20 @@ const _ = require('lodash');
 function compareHeaders (allHeaders, headersToFind) {
   assert.deepEqual(
     _.pick(allHeaders, Object.keys(headersToFind)),
-    headersToFind,
+    headersToFind
   );
 }
 
 Object.assign(global, {
   _,
   assert,
-  Application: Application,
+  Application,
   app: new Application(),
-  Mock: require('./fixture/Mock'),
+  mock: require('./fixture/mock'),
   DummySession: require('./fixture/DummySession'),
   supertest: require('supertest'),
   getConfig,
   single: require('./fixture/singleMode'),
   replaceRecursively: require('../src/utils/replaceRecursively'),
-  compareHeaders,
+  compareHeaders
 });
-

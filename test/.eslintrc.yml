@@ -1,0 +1,14 @@
+env:
+  mocha: true
+globals:
+  _: readonly
+  assert: readonly
+  Application: readonly
+  app: readonly
+  mock: readonly
+  DummySession: readonly
+  supertest: readonly
+  getConfig: readonly
+  single: readonly
+  replaceRecursively: readonly
+  compareHeaders: readonly

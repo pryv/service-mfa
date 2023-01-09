@@ -14,9 +14,7 @@ COPY . $TARGET_DIR
 WORKDIR $TARGET_DIR
 
 # Skipping this as it's done in GitHub workflow
-# Perform a release build of the source code. (-> dist)
 #RUN just install
-#RUN just compile-release > /dev/null
 
 # Copy config file
 RUN mkdir -p $CONF_DIR && \

@@ -1,17 +1,13 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
-/*global describe, it, before */
 
 describe('POST /mfa/challenge', function () {
   const username = 'testuser';
   let settings, challengeEndpoint, request;
-
   describe('mode="challenge-verify"', () => {
     before(async () => {
       await app.init();
@@ -19,52 +15,56 @@ describe('POST /mfa/challenge', function () {
       challengeEndpoint = settings.get('sms:endpoints:challenge:url');
       request = supertest(app.express);
     });
-  
-    
     let challengeReq, res, session;
     before(async () => {
       session = new DummySession(app, username);
-      new Mock(challengeEndpoint, '', 'POST', 200, {}, (req) => challengeReq = req);
+      mock(
+        challengeEndpoint,
+        '',
+        'POST',
+        200,
+        {},
+        (req) => (challengeReq = req)
+      );
       res = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send({});
     });
-  
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq);
       assert.deepEqual(challengeReq.body, session.profile.content);
-      compareHeaders(challengeReq.headers, settings.get('sms:endpoints:challenge:headers'));
+      compareHeaders(
+        challengeReq.headers,
+        settings.get('sms:endpoints:challenge:headers')
+      );
     });
-  
     it('answers 200 and asks to verify the MFA challenge', async () => {
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.message, 'Please verify the MFA challenge.');
     });
-  
     describe('when the MFA challenge could not be triggered', function () {
-      const serviceError = { error: {
-        id: 'unexpected',
-        message: 'Could not trigger the challenge.'}
+      const serviceError = {
+        error: {
+          id: 'unexpected',
+          message: 'Could not trigger the challenge.'
+        }
       };
-  
       let res;
       before(async () => {
         const mfaToken = new DummySession(app, username).mfaToken;
-        new Mock(challengeEndpoint, '', 'POST', 400, serviceError);
+        mock(challengeEndpoint, '', 'POST', 400, serviceError);
         res = await request
           .post(`/${username}/mfa/challenge`)
           .set('Authorization', mfaToken)
           .send({});
       });
-  
       it('returns a messaging service error', async () => {
         assert.strictEqual(res.status, 400);
-        assert.equal(res.body.error.id, 'messaging-server-error')
+        assert.equal(res.body.error.id, 'messaging-server-error');
       });
     });
   });
-
   describe('mode="single"', () => {
     let config;
     before(async () => {
@@ -77,25 +77,34 @@ describe('POST /mfa/challenge', function () {
     after(() => {
       config.injectTestConfig({});
     });
-  
-    let challengeReqs = [], res, res2, codes = [], session;
-
+    let challengeReqs = [];
+    let res;
+    const codes = [];
+    let session;
     const profile = single.profile;
     const query = single.query;
     const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
       session = new DummySession(app, username, profile);
-      new Mock(single.url, '', 'POST', 200, {}, (req) => challengeReqs.push(req), query, 2);
+      mock(
+        single.url,
+        '',
+        'POST',
+        200,
+        {},
+        (req) => challengeReqs.push(req),
+        query,
+        2
+      );
       res = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
-      res2 = await request
+      await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
     });
-  
     it('triggers the MFA challenge', () => {
       assert.isDefined(challengeReqs[0], 'challenge request was not sent');
       const body = challengeReqs[0].body;
@@ -114,39 +123,40 @@ describe('POST /mfa/challenge', function () {
       assert.notEqual(code, codes[0]);
     });
     it('accepts them', async () => {
-      challengeReqs = challengeReqs.map(req => single.extractCodeFromBody(req.body));
+      challengeReqs = challengeReqs.map((req) =>
+        single.extractCodeFromBody(req.body)
+      );
       const res3 = await request
         .post(`/${username}/mfa/verify`)
         .set('Authorization', session.mfaToken)
-        .send({ code: challengeReqs[challengeReqs.length - 1]});
+        .send({ code: challengeReqs[challengeReqs.length - 1] });
       assert.equal(res3.status, 200);
     });
-  
     describe('when the MFA challenge could not be triggered', function () {
-      const serviceError = { error: {
-        id: 'unexpected',
-        message: 'Could not trigger the challenge.'}
+      const serviceError = {
+        error: {
+          id: 'unexpected',
+          message: 'Could not trigger the challenge.'
+        }
       };
-  
       let res;
       before(async () => {
-        const mfaToken = new DummySession(app, username, single.profile).mfaToken;
-        new Mock(single.url, '', 'POST', 400, serviceError, null, query);
+        const mfaToken = new DummySession(app, username, single.profile)
+          .mfaToken;
+        mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
           .post(`/${username}/mfa/challenge`)
           .set('Authorization', mfaToken)
           .send({});
       });
-  
       it('returns a messaging service error', async () => {
         assert.strictEqual(res.status, 400);
-        assert.equal(res.body.error.id, 'messaging-server-error')
+        assert.equal(res.body.error.id, 'messaging-server-error');
       });
     });
   });
-
   describe('mode="single" and method="GET"', () => {
-    let config;
+    let config, session;
     before(async () => {
       config = await getConfig();
       const configWithGet = _.cloneDeep(single.config);
@@ -159,35 +169,36 @@ describe('POST /mfa/challenge', function () {
     after(() => {
       config.injectTestConfig({});
     });
-  
     let challengeReq, res;
-
     const profile = single.profile;
     const query = single.query;
     const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
       session = new DummySession(app, username, profile);
-      new Mock(single.url, '', 'GET', 200, {}, (req) => challengeReq = req, query);
+      mock(
+        single.url,
+        '',
+        'GET',
+        200,
+        {},
+        (req) => (challengeReq = req),
+        query
+      );
       res = await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
     });
-  
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
       compareHeaders(challengeReq.headers, headers);
     });
-  
     it('answers 200 and asks to verify the MFA challenge', async () => {
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.message, 'Please verify the MFA challenge.');
     });
-  
   });
-
   describe('when the MFA session token is invalid', function () {
-
     let res;
     before(async () => {
       res = await request
@@ -195,7 +206,6 @@ describe('POST /mfa/challenge', function () {
         .set('Authorization', 'invalidMfaToken')
         .send({});
     });
-
     it('returns an error', async () => {
       assert.strictEqual(res.status, 403);
       assert.strictEqual(res.body.error.message, 'Invalid MFA session token.');

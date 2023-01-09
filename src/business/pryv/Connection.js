@@ -1,33 +1,49 @@
 /**
  * @license
- * Copyright (C) 2019–2022 Pryv S.A. https://pryv.com - All Rights Reserved
+ * Copyright (C) 2019–2023 Pryv S.A. https://pryv.com - All Rights Reserved
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const request = require('superagent');
-
 const Profile = require('../mfa/Profile');
 const { factory } = require('../../utils/errorsHandling');
-
 const PERSONAL_ACCESS_TYPE = 'personal';
 
 class Connection {
+  /**
+   * @type {string}
+   */
+  token = undefined;
+  /**
+   * @type {string}
+   */
+  username = undefined;
+  /**
+   * @type {string}
+   */
+  coreUrl = undefined;
+  /**
+   * @type {object}
+   */
+  content = undefined;
 
-  token: ?string;
-  username: string;
-  coreUrl: string;
-  content: ?object;
-
-  constructor(settings: Object, username: string, token: ?string) {
+  /**
+   * @param {*} settings
+   * @param {string} username
+   * @param {string|null} token
+   */
+  constructor (settings, username, token) {
     this.username = username;
     this.coreUrl = settings.get('core:url');
     this.token = token;
     this.content = null;
   }
 
-  async login(req: express$Request): Promise<void> {
+  /**
+   * @param {express$Request} req
+   * @returns {Promise<void>}
+   */
+  async login (req) {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
       .set(allowedHeaders(req.headers))
@@ -36,7 +52,11 @@ class Connection {
     this.content = res.body;
   }
 
-  async fetchProfile(req: express$Request): Promise<Profile> {
+  /**
+   * @param {express$Request} req
+   * @returns {Promise<any>}
+   */
+  async fetchProfile (req) {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/profile/private`)
       .set(allowedHeaders(req.headers))
@@ -47,42 +67,56 @@ class Connection {
     return new Profile(mfaProfile.content, mfaProfile.recoveryCodes);
   }
 
-  async updateProfile(reqHeaders: Map<string, string>, profile: ?Profile): Promise<void> {
+  /**
+   * @param {Map<string, string>} reqHeaders
+   * @param {Profile | null} profile
+   * @returns {Promise<void>}
+   */
+  async updateProfile (reqHeaders, profile) {
     let update = null;
     if (profile != null) {
       update = {
         content: profile.content,
-        recoveryCodes: profile.recoveryCodes,
+        recoveryCodes: profile.recoveryCodes
       };
     }
     await request
       .put(`${this.coreUrl}/${this.username}/profile/private`)
       .set(allowedHeaders(reqHeaders))
       .set('Authorization', this.token)
-      .send({mfa: update});
+      .send({ mfa: update });
   }
 
-  async checkAccess(req: express$Request): Promise<void> {
+  /**
+   * @param {express$Request} req
+   * @returns {Promise<void>}
+   */
+  async checkAccess (req) {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/access-info`)
       .set(allowedHeaders(req.headers))
       .set('Authorization', this.token);
     if (res.body.type !== PERSONAL_ACCESS_TYPE) {
-      const error = factory.unauthorized('You cannot access this resource using the given access token.')
+      const error = factory.unauthorized(
+        'You cannot access this resource using the given access token.'
+      );
       throw error;
     }
   }
 }
+module.exports = Connection;
 
-function allowedHeaders(headers: Object): mixed {
+/**
+ * @param {any} headers
+ * @returns {unknown}
+ */
+function allowedHeaders (headers) {
   const allowed = ['origin', 'Origin', 'referer', 'Referer', 'host', 'Host'];
   const filtered = Object.keys(headers)
-    .filter(key => allowed.includes(key))
+    .filter((key) => allowed.includes(key))
     .reduce((obj, key) => {
       obj[key] = headers[key];
       return obj;
     }, {});
   return filtered;
 }
-
-module.exports = Connection;
