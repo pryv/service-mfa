@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const request = require('superagent');
 
 const Profile = require('../mfa/Profile');
@@ -15,12 +13,12 @@ const PERSONAL_ACCESS_TYPE = 'personal';
 
 class Connection {
 
-  token: ?string;
+  token: string | undefined | null;
   username: string;
   coreUrl: string;
-  content: ?object;
+  content: object | undefined | null;
 
-  constructor(settings: Object, username: string, token: ?string) {
+  constructor(settings: any, username: string, token?: string | null) {
     this.username = username;
     this.coreUrl = settings.get('core:url');
     this.token = token;
@@ -47,7 +45,7 @@ class Connection {
     return new Profile(mfaProfile.content, mfaProfile.recoveryCodes);
   }
 
-  async updateProfile(reqHeaders: Map<string, string>, profile: ?Profile): Promise<void> {
+  async updateProfile(reqHeaders: Map<string, string>, profile?: Profile | null): Promise<void> {
     let update = null;
     if (profile != null) {
       update = {
@@ -74,7 +72,7 @@ class Connection {
   }
 }
 
-function allowedHeaders(headers: Object): mixed {
+function allowedHeaders(headers: any): unknown {
   const allowed = ['origin', 'Origin', 'referer', 'Referer', 'host', 'Host'];
   const filtered = Object.keys(headers)
     .filter(key => allowed.includes(key))

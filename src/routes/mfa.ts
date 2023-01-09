@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const middlewares = require('../middlewares');
 const PryvConnection = require('../business/pryv/Connection');
 const MFAProfile = require('../business/mfa/Profile');
@@ -14,7 +12,7 @@ const errorsFactory = require('../utils/errorsHandling').factory;
 
 import type MFAService from '../business/mfa/Service';
 
-module.exports = function (expressApp: express$Application, settings: Object, mfaService: MFAService) {
+module.exports = function (expressApp: express$Application, settings: any, mfaService: MFAService) {
 
   // POST /:username/mfa/activate: activate mfa
   expressApp.post('/:username/mfa/activate',

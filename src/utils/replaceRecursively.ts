@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 /**
  * in objects, replaces "search" by "replace" in all string values, recursively
  * 
@@ -13,7 +11,7 @@
  * @param {*} search 
  * @param {*} replace 
  */
-function replaceRecursively(object: mixed, search: string, replace: string): {} {
+function replaceRecursively(object: unknown, search: string, replace: string): {} {
   if (object == null) return {};
   Object.keys(object).forEach(key => {
     if (typeof object[key] === 'string') return object[key] = object[key].replace(search, replace); 

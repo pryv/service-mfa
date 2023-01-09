@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const errors = require('./errors');
 const session = require('./session');
 const subdomainToPath = require('./subdomainToPath');

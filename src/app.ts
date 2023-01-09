@@ -4,7 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
 const path = require('path');
 const { getConfig } = require('@pryv/boiler').init({
   appName: 'service-mfa',

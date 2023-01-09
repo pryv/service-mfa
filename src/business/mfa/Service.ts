@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const request = require('superagent');
 const Session = require('./Session');
 
@@ -16,11 +14,11 @@ const { ApiError } = require('../../utils/errorsHandling');
 
 class Service {
 
-  logger: mixed;
+  logger: unknown;
   ttlMilliseconds: number;
   sessions: Map<string, Session>;
 
-  constructor(settings: Object) {
+  constructor(settings: any) {
     this.ttlMilliseconds = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
     this.logger = getLogger('mfaService');
@@ -38,7 +36,7 @@ class Service {
     return this.sessions.has(id);
   }
 
-  getSession(id: string): ?Session {
+  getSession(id: string): Session | undefined | null {
     return this.sessions.get(id);
   }
 
@@ -64,7 +62,7 @@ class Service {
    * @param {*} headers 
    * @param {*} body 
    */
-  async _makeRequest(method: string, url: string, headers: Map<string, string>, body: string): Promise<void>{
+  async _makeRequest(method: string, url: string, headers: Map<string, string>, body: string): Promise<void> {
     try {
       if (method === 'POST') {
         return await request

@@ -4,16 +4,15 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
 const uuidv4 = require('uuid/v4');
 const _ = require('lodash');
 
 class Profile {
 
-  content: mixed;
+  content: unknown;
   recoveryCodes: Array<string>;
   
-  constructor(content: mixed = {}, recoveryCodes: Array<string> = []) {
+  constructor(content: unknown = {}, recoveryCodes: Array<string> = []) {
     this.recoveryCodes = recoveryCodes;
     this.content = content;
   }

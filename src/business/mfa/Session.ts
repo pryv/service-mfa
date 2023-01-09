@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const uuidv4 = require('uuid/v4');
 
 import type PryvConnection from '../pryv/Connection';

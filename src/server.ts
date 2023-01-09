@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const Application = require('./app');
 const logger = require('@pryv/boiler').getLogger('server');
 

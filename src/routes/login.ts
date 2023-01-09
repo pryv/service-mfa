@@ -4,14 +4,12 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const PryvConnection = require('../business/pryv/Connection');
 const logger = require('@pryv/boiler').getLogger('routes');
 
 import type MFAService from '../business/mfa/Service';
 
-module.exports = function (expressApp: express$Application, settings: Object, mfaService: MFAService) {
+module.exports = function (expressApp: express$Application, settings: any, mfaService: MFAService) {
 
   // POST /login: proxied Pryv login
   expressApp.post('/:username/login',

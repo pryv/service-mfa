@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const request = require('superagent');
 
 const Service = require('./Service');
@@ -24,7 +22,7 @@ class ChallengeVerifyService extends Service {
   verifyHeaders: Map<string, string>;
   verifyBody: string;
 
-  constructor(settings: Object) {
+  constructor(settings: any) {
     super(settings);
     this.challengeUrl = settings.get('sms:endpoints:challenge:url');
     this.challengeMethod = settings.get('sms:endpoints:challenge:method');

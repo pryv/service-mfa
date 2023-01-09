@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 // Class that implements an Api Error.
 //
 class ApiError extends Error {
@@ -39,12 +37,12 @@ class ErrorsFactory {
     return new ApiError(500, msg, 'unexpected-error');
   }
 
-  unauthorized(message: ?string) {
+  unauthorized(message?: string | null) {
     const msg = message || 'Operation is not authorized.';
     return new ApiError(403, msg, 'forbidden');
   }
 
-  invalidParameter(message: ?string) {
+  invalidParameter(message?: string | null) {
     const msg = message || 'Some of the provided parameters are invalid.';
     return new ApiError(400, msg, 'invalid-parameters-format');
   }
@@ -54,12 +52,12 @@ class ErrorsFactory {
     return new ApiError(400, msg, 'invalid-request-structure');
   }
 
-  missingHeader (headerName: string): ApiError {
+  missingHeader(headerName: string): ApiError {
     const msg = `Missing expected header "${headerName}".`;
     return new ApiError(400, msg, 'missing-header');
   }
 
-  notFound (message: ?string): ApiError {
+  notFound(message?: string | null): ApiError {
     const msg = message || 'Resource not found.';
     return new ApiError(404, msg, 'unknown-resource');
   }

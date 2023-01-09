@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 /**
  * Replaces all occurences of "search" with "replace" in "text"
  * 
@@ -15,7 +13,7 @@
  * @param {*} search 
  * @param {*} replace 
  */
-function replaceAll (text: string, search: string, replace: string): string {
+function replaceAll(text: string, search: string, replace: string): string {
   return text.split(search).join(replace);
 }
 module.exports = replaceAll;

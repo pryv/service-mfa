@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const _ = require('lodash');
 const request = require('superagent');
 
@@ -27,10 +25,10 @@ class SingleService extends Service {
   /**
    * username -> code
    */
-  codes: Map<string, string>
-  timeouts: Map<string, Timeout>
+  codes: Map<string, string>;
+  timeouts: Map<string, Timeout>;
 
-  constructor(settings: Object) {
+  constructor(settings: any) {
     super(settings);
     this.url = settings.get('sms:endpoints:single:url');
     this.apiMethod = settings.get('sms:endpoints:single:method');

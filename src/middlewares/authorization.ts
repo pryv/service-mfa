@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const errorsFactory = require('../utils/errorsHandling').factory;
 
 // Middleware that verifies the presence of an authorization token

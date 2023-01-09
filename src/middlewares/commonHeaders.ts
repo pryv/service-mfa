@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 // Middleware to handle OPTIONS requests and to add CORS headers to all other 
 // requests. 
 

@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const errors = require('../utils/errorsHandling').factory;
 
 // Middleware to translate the subdomain (i.e. username) in requests (if any) into the URL path

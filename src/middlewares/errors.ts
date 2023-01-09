@@ -4,8 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-// @flow
-
 const errorsHandling = require('../utils/errorsHandling');
 const ApiError = errorsHandling.ApiError;
 const logger = require('@pryv/boiler').getLogger('errors');
