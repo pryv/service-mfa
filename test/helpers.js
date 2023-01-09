@@ -10,10 +10,10 @@ const Application = require('../src/app');
 const assert = require('chai').assert;
 const _ = require('lodash');
 
-function compareHeaders (allHeaders, headersToFind) {
+function compareHeaders(allHeaders, headersToFind) {
   assert.deepEqual(
     _.pick(allHeaders, Object.keys(headersToFind)),
-    headersToFind,
+    headersToFind
   );
 }
 
@@ -28,6 +28,5 @@ Object.assign(global, {
   getConfig,
   single: require('./fixture/singleMode'),
   replaceRecursively: require('../src/utils/replaceRecursively'),
-  compareHeaders,
+  compareHeaders
 });
-
