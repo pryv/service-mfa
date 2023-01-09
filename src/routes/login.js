@@ -34,4 +34,3 @@ module.exports = function (expressApp, settings, mfaService) {
     }
   });
 };
-export {};

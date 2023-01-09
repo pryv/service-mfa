@@ -8,12 +8,10 @@
 .project
 .settings
 .vscode/
-/flow-coverage/
 /out
 application.log
 build/build_tag
 build/release.tar
 coverage/
-dist
 mfa.log
 node_modules/

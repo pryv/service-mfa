@@ -32,9 +32,6 @@ ignore:
 - .git
 - .vscode
 - coverage
-- dist
-- flow-coverage
-- flow-typed
 - node_modules
 
 license: |

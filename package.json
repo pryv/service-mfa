@@ -19,13 +19,8 @@
     "z-schema": "^5.0.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^10.0.2",
-    "babel-preset-flow": "^6.23.0",
     "chai": "^4.3.6",
     "eslint": "^6.1.0",
-    "eslint-plugin-flowtype": "^3.12.1",
-    "flow-bin": "^0.176.3",
     "mocha": "^9.2.2",
     "nock": "^10.0.6",
     "source-licenser": "^2.0.4",
