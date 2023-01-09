@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-const uuidv4 = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 const _ = require('lodash');
 
 class Profile {
