@@ -23,7 +23,7 @@ module.exports = function (expressApp, settings, mfaService) {
 
       if (mfaProfile.isActive()) {
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
-        res.status(302).send({ mfaToken: mfaToken });
+        res.status(302).send({ mfaToken });
       } else {
         res.status(200).send(pryvConnection.content);
       }

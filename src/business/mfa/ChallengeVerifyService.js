@@ -4,7 +4,6 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-const request = require('superagent');
 const Service = require('./Service');
 const replaceRecursively = require('../../utils/replaceRecursively');
 const replaceAll = require('../../utils/replaceAll');
@@ -46,7 +45,7 @@ class ChallengeVerifyService extends Service {
    */
   verifyBody = undefined;
 
-  constructor(settings) {
+  constructor (settings) {
     super(settings);
     this.challengeUrl = settings.get('sms:endpoints:challenge:url');
     this.challengeMethod = settings.get('sms:endpoints:challenge:method');
@@ -64,7 +63,7 @@ class ChallengeVerifyService extends Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async challenge(username, profile, clientRequest) {
+  async challenge (username, profile, clientRequest) {
     const replacements = profile.content;
     let url = this.challengeUrl;
     let headers = this.challengeHeaders;
@@ -83,7 +82,7 @@ class ChallengeVerifyService extends Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async verify(username, profile, clientRequest) {
+  async verify (username, profile, clientRequest) {
     const replacements = Object.assign({}, clientRequest.body, profile.content);
     let url = this.verifyUrl;
     let headers = this.verifyHeaders;

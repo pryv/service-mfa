@@ -33,7 +33,7 @@ module.exports = function (expressApp, settings, mfaService) {
         const mfaProfile = new MFAProfile(req.body);
         await mfaService.challenge(username, mfaProfile, req);
         const mfaToken = mfaService.saveSession(mfaProfile, pryvConnection);
-        res.status(302).send({ mfaToken: mfaToken });
+        res.status(302).send({ mfaToken });
         logger.info(`${req.method} ${req.url} ${res.statusCode}`);
       } catch (err) {
         next(err);

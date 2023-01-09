@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-function replaceAll(text, search, replace) {
+function replaceAll (text, search, replace) {
   return text.split(search).join(replace);
 }
 module.exports = replaceAll;

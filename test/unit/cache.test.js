@@ -4,17 +4,17 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-/*global describe, it */
+
 const assert = require('chai').assert;
 const Application = require('../../src/app');
 const app = new Application();
 const DummySession = require('../fixture/DummySession');
+
 describe('Cache for MFA sessions', function () {
   let ttlSeconds, maxTime;
   before(async function () {
     await app.init();
-    settings = app.settings;
-    ttlSeconds = settings.get('sessions:ttlSeconds');
+    ttlSeconds = app.settings.get('sessions:ttlSeconds');
     maxTime = (ttlSeconds + 0.1) * 1000;
     this.timeout((ttlSeconds + 0.2) * 1000);
   });

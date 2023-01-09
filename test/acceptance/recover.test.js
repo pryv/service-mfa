@@ -4,6 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
+
 describe('POST /mfa/recover', function () {
   let settings, coreEndpoint, request, loginHeaders;
   const username = 'testuser';
@@ -19,13 +20,13 @@ describe('POST /mfa/recover', function () {
   const pryvToken = 'validToken';
   const recoveryCode = 'validCode';
   const loginParams = {
-    username: username,
+    username,
     password: 'testpassword',
     appId: 'pryv-test'
   };
   let loginReq, fetchProfileReq, updateProfileReq, res;
   before(async () => {
-    new Mock(
+    mock(
       coreEndpoint,
       '/auth/login',
       'POST',
@@ -33,7 +34,7 @@ describe('POST /mfa/recover', function () {
       { token: pryvToken },
       (req) => (loginReq = req)
     );
-    new Mock(
+    mock(
       coreEndpoint,
       '/profile/private',
       'GET',
@@ -41,7 +42,7 @@ describe('POST /mfa/recover', function () {
       { profile: { mfa: { recoveryCodes: [recoveryCode] } } },
       (req) => (fetchProfileReq = req)
     );
-    new Mock(
+    mock(
       coreEndpoint,
       '/profile/private',
       'PUT',
@@ -52,7 +53,7 @@ describe('POST /mfa/recover', function () {
     res = await request
       .post(`/${username}/mfa/recover`)
       .set(loginHeaders)
-      .send(Object.assign({}, loginParams, { recoveryCode: recoveryCode }));
+      .send(Object.assign({}, loginParams, { recoveryCode }));
   });
   it('forwards the login call to Pryv', async () => {
     assert.isDefined(loginReq);
@@ -61,12 +62,12 @@ describe('POST /mfa/recover', function () {
   });
   it('retrieves the Pryv private profile', async () => {
     assert.isDefined(fetchProfileReq);
-    assert.strictEqual(fetchProfileReq.headers['authorization'], pryvToken);
+    assert.strictEqual(fetchProfileReq.headers.authorization, pryvToken);
   });
   it('clears the MFA field in the Pryv profile', async () => {
     assert.isDefined(updateProfileReq);
     assert.deepEqual(updateProfileReq.body, { mfa: null });
-    assert.strictEqual(updateProfileReq.headers['authorization'], pryvToken);
+    assert.strictEqual(updateProfileReq.headers.authorization, pryvToken);
   });
   it('answers 200 and confirms that MFA is deactivated', async () => {
     assert.strictEqual(res.status, 200);
@@ -91,7 +92,7 @@ describe('POST /mfa/recover', function () {
   describe('when the recovery code is invalid', function () {
     let res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/auth/login',
         'POST',
@@ -99,7 +100,7 @@ describe('POST /mfa/recover', function () {
         { token: pryvToken },
         (req) => (loginReq = req)
       );
-      new Mock(
+      mock(
         coreEndpoint,
         '/profile/private',
         'GET',
@@ -126,10 +127,10 @@ describe('POST /mfa/recover', function () {
     };
     let res;
     before(async () => {
-      new Mock(coreEndpoint, '/auth/login', 'POST', 401, pryvError);
+      mock(coreEndpoint, '/auth/login', 'POST', 401, pryvError);
       res = await request
         .post(`/${username}/mfa/recover`)
-        .send(Object.assign({}, loginParams, { recoveryCode: recoveryCode }));
+        .send(Object.assign({}, loginParams, { recoveryCode }));
     });
     it('returns the Pryv error', async () => {
       assert.strictEqual(res.status, 401);

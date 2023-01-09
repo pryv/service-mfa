@@ -27,7 +27,7 @@ class DummySession {
    * @param {string} username
    * @param {*} profileContent
    */
-  constructor(app, username, profileContent = { phone_number: '1234' }) {
+  constructor (app, username, profileContent = { phone_number: '1234' }) {
     this.profile = new MFAProfile(profileContent);
     this.pryvConnection = new PryvConnection(
       app.settings,

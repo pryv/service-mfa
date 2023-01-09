@@ -20,7 +20,7 @@ class Service {
    */
   sessions = undefined;
 
-  constructor(settings) {
+  constructor (settings) {
     this.ttlMilliseconds = settings.get('sessions:ttlSeconds') * 1000;
     this.sessions = new Map();
     this.logger = getLogger('mfaService');
@@ -32,7 +32,7 @@ class Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async challenge(username, profile, clientRequest) {
+  async challenge (username, profile, clientRequest) {
     throw new Error('override this method in a Service extension');
   }
 
@@ -42,7 +42,7 @@ class Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async verify(username, profile, clientRequest) {
+  async verify (username, profile, clientRequest) {
     throw new Error('override this method in a Service extension');
   }
 
@@ -50,7 +50,7 @@ class Service {
    * @param {string} id
    * @returns {boolean}
    */
-  hasSession(id) {
+  hasSession (id) {
     return this.sessions.has(id);
   }
 
@@ -58,7 +58,7 @@ class Service {
    * @param {string} id
    * @returns {any}
    */
-  getSession(id) {
+  getSession (id) {
     return this.sessions.get(id);
   }
 
@@ -67,7 +67,7 @@ class Service {
    * @param {PryvConnection} pryvConnection
    * @returns {string}
    */
-  saveSession(profile, pryvConnection) {
+  saveSession (profile, pryvConnection) {
     this.logger.info('saving session for ' + pryvConnection.username);
     const newSession = new Session(profile, pryvConnection);
     this.sessions.set(newSession.id, newSession);
@@ -81,7 +81,7 @@ class Service {
    * @param {string} id
    * @returns {boolean}
    */
-  clearSession(id) {
+  clearSession (id) {
     return this.sessions.delete(id);
   }
 
@@ -94,7 +94,7 @@ class Service {
    * @param {string} body  undefined
    * @returns {Promise<void>}
    */
-  async _makeRequest(method, url, headers, body) {
+  async _makeRequest (method, url, headers, body) {
     try {
       if (method === 'POST') {
         return await request.post(url).set(headers).send(body);
@@ -108,10 +108,11 @@ class Service {
           headers
         )} and body: ${JSON.stringify(body)}.`
       );
-      if (error.response)
+      if (error.response) {
         this.logger.error(
           `Service response: ${JSON.stringify(error.response.body)}`
         );
+      }
       throw new ApiError(
         400,
         `Error from messaging service. Error message: "${error.message}"`,

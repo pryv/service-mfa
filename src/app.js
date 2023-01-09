@@ -34,12 +34,10 @@ class Application {
    */
   mfaService = undefined;
 
-  constructor() {}
-
   /**
    * @returns {Promise<this>}
    */
-  async init() {
+  async init () {
     this.settings = await getConfig();
     this.mfaService = bootCorrectMfaService(this.settings);
     this.express = this.setupExpressApp();
@@ -49,7 +47,7 @@ class Application {
   /**
    * @returns {any}
    */
-  setupExpressApp() {
+  setupExpressApp () {
     const expressApp = express();
     expressApp.disable('x-powered-by');
     expressApp.use(express.json());
@@ -67,7 +65,7 @@ module.exports = Application;
  * @param {{}} settings
  * @returns {any}
  */
-function bootCorrectMfaService(settings) {
+function bootCorrectMfaService (settings) {
   const mode = settings.get('sms:mode');
   if (mode === 'challenge-verify') return new ChallengeVerifyService(settings);
   if (mode === 'single') return new SingleService(settings);

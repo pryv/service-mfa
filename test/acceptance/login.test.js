@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-/*global describe, it, before */
+
 describe('POST /auth/login', function () {
   const username = 'testuser';
   let settings, coreEndpoint, request, loginHeaders;
@@ -18,7 +18,7 @@ describe('POST /auth/login', function () {
     };
   });
   const loginParams = {
-    username: username,
+    username,
     password: 'testpassword',
     appId: 'pryv-test'
   };
@@ -29,7 +29,7 @@ describe('POST /auth/login', function () {
   describe('when MFA is not activated', function () {
     let loginReq, profileReq, res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/auth/login',
         'POST',
@@ -41,7 +41,7 @@ describe('POST /auth/login', function () {
         },
         (req) => (loginReq = req)
       );
-      new Mock(
+      mock(
         coreEndpoint,
         '/profile/private',
         'GET',
@@ -61,7 +61,7 @@ describe('POST /auth/login', function () {
     });
     it('retrieves the Pryv private profile', async () => {
       assert.isDefined(profileReq);
-      assert.strictEqual(profileReq.headers['authorization'], pryvToken);
+      assert.strictEqual(profileReq.headers.authorization, pryvToken);
     });
     it('simply returns the Pryv token', async () => {
       assert.strictEqual(res.status, 200);
@@ -76,7 +76,7 @@ describe('POST /auth/login', function () {
   describe('when MFA is activated', function () {
     let loginReq, profileReq, res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/auth/login',
         'POST',
@@ -84,7 +84,7 @@ describe('POST /auth/login', function () {
         { token: pryvToken },
         (req) => (loginReq = req)
       );
-      new Mock(
+      mock(
         coreEndpoint,
         '/profile/private',
         'GET',
@@ -100,7 +100,7 @@ describe('POST /auth/login', function () {
     });
     it('retrieves the Pryv private profile', async () => {
       assert.isDefined(profileReq);
-      assert.strictEqual(profileReq.headers['authorization'], pryvToken);
+      assert.strictEqual(profileReq.headers.authorization, pryvToken);
     });
     it('answers 302 with a generated MFA session token', async () => {
       assert.strictEqual(res.status, 302);
@@ -130,7 +130,7 @@ describe('POST /auth/login', function () {
     };
     let res;
     before(async () => {
-      new Mock(coreEndpoint, '/auth/login', 'POST', 401, pryvError);
+      mock(coreEndpoint, '/auth/login', 'POST', 401, pryvError);
       res = await request.post(`/${username}/login`).send({});
     });
     it('returns the Pryv error', async () => {

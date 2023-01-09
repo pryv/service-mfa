@@ -11,12 +11,12 @@ const randomBytes = promisify(require('crypto').randomBytes);
  * @param {number} codeLength
  * @returns {Promise<string>}
  */
-async function generateCode(codeLength) {
+async function generateCode (codeLength) {
   const bytes = await randomBytes(4);
   const hex = bytes.toString('hex');
   const code = parseInt(hex, 16);
   return fixLength(code + '', codeLength);
-  function fixLength(number, desiredLength) {
+  function fixLength (number, desiredLength) {
     const length = number.length;
     const pad = desiredLength - length;
     if (pad === 0) {

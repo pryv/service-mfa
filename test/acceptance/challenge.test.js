@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-/*global describe, it, before */
+
 describe('POST /mfa/challenge', function () {
   const username = 'testuser';
   let settings, challengeEndpoint, request;
@@ -18,7 +18,7 @@ describe('POST /mfa/challenge', function () {
     let challengeReq, res, session;
     before(async () => {
       session = new DummySession(app, username);
-      new Mock(
+      mock(
         challengeEndpoint,
         '',
         'POST',
@@ -53,7 +53,7 @@ describe('POST /mfa/challenge', function () {
       let res;
       before(async () => {
         const mfaToken = new DummySession(app, username).mfaToken;
-        new Mock(challengeEndpoint, '', 'POST', 400, serviceError);
+        mock(challengeEndpoint, '', 'POST', 400, serviceError);
         res = await request
           .post(`/${username}/mfa/challenge`)
           .set('Authorization', mfaToken)
@@ -77,17 +77,16 @@ describe('POST /mfa/challenge', function () {
     after(() => {
       config.injectTestConfig({});
     });
-    let challengeReqs = [],
-      res,
-      res2,
-      codes = [],
-      session;
+    let challengeReqs = [];
+    let res;
+    const codes = [];
+    let session;
     const profile = single.profile;
     const query = single.query;
     const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
       session = new DummySession(app, username, profile);
-      new Mock(
+      mock(
         single.url,
         '',
         'POST',
@@ -101,7 +100,7 @@ describe('POST /mfa/challenge', function () {
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
-      res2 = await request
+      await request
         .post(`/${username}/mfa/challenge`)
         .set('Authorization', session.mfaToken)
         .send();
@@ -144,7 +143,7 @@ describe('POST /mfa/challenge', function () {
       before(async () => {
         const mfaToken = new DummySession(app, username, single.profile)
           .mfaToken;
-        new Mock(single.url, '', 'POST', 400, serviceError, null, query);
+        mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
           .post(`/${username}/mfa/challenge`)
           .set('Authorization', mfaToken)
@@ -157,7 +156,7 @@ describe('POST /mfa/challenge', function () {
     });
   });
   describe('mode="single" and method="GET"', () => {
-    let config;
+    let config, session;
     before(async () => {
       config = await getConfig();
       const configWithGet = _.cloneDeep(single.config);
@@ -176,7 +175,7 @@ describe('POST /mfa/challenge', function () {
     const headers = single.config.sms.endpoints.single.headers;
     before(async () => {
       session = new DummySession(app, username, profile);
-      new Mock(
+      mock(
         single.url,
         '',
         'GET',

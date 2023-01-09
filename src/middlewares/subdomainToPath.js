@@ -49,7 +49,7 @@ const USERNAME_REGEXP_STR =
  * @param {string} candidate
  * @returns {boolean}
  */
-function looksLikeUsername(candidate) {
+function looksLikeUsername (candidate) {
   const reUsername = new RegExp(USERNAME_REGEXP_STR);
   const lowercasedUsername = candidate.toLowerCase(); // for retro-compatibility
   return reUsername.test(lowercasedUsername);

@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-/*global describe, it, before */
+
 describe('POST /mfa/confirm', function () {
   const username = 'testuser';
   let settings, coreEndpoint, verifyEndpoint, request;
@@ -20,8 +20,8 @@ describe('POST /mfa/confirm', function () {
     });
     before(async () => {
       session = new DummySession(app, username);
-      new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => (verifyReq = req));
-      new Mock(
+      mock(verifyEndpoint, '', 'POST', 200, {}, (req) => (verifyReq = req));
+      mock(
         coreEndpoint,
         '/profile/private',
         'PUT',
@@ -49,7 +49,7 @@ describe('POST /mfa/confirm', function () {
     it('updates the Pryv profile with the MFA parameters', async () => {
       assert.isDefined(profileReq);
       assert.strictEqual(
-        profileReq.headers['authorization'],
+        profileReq.headers.authorization,
         session.pryvConnection.token
       );
       assert.deepEqual(
@@ -84,7 +84,7 @@ describe('POST /mfa/confirm', function () {
       let res;
       before(async () => {
         const mfaToken = new DummySession(app, username).mfaToken;
-        new Mock(verifyEndpoint, '', 'POST', 400, serviceError);
+        mock(verifyEndpoint, '', 'POST', 400, serviceError);
         res = await request
           .post(`/${username}/mfa/confirm`)
           .set('Authorization', mfaToken)
@@ -113,7 +113,7 @@ describe('POST /mfa/confirm', function () {
     before(async () => {
       session = new DummySession(app, username);
       app.mfaService.setCode(username, body.code, 1000);
-      new Mock(
+      mock(
         coreEndpoint,
         '/profile/private',
         'PUT',
@@ -132,7 +132,7 @@ describe('POST /mfa/confirm', function () {
     it('updates the Pryv profile with the MFA parameters', async () => {
       assert.isDefined(profileReq);
       assert.equal(
-        profileReq.headers['authorization'],
+        profileReq.headers.authorization,
         session.pryvConnection.token
       );
       assert.deepEqual(profileReq.body.mfa.content, session.profile.content);

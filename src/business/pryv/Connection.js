@@ -32,7 +32,7 @@ class Connection {
    * @param {string} username
    * @param {string|null} token
    */
-  constructor(settings, username, token) {
+  constructor (settings, username, token) {
     this.username = username;
     this.coreUrl = settings.get('core:url');
     this.token = token;
@@ -43,7 +43,7 @@ class Connection {
    * @param {express$Request} req
    * @returns {Promise<void>}
    */
-  async login(req) {
+  async login (req) {
     const res = await request
       .post(`${this.coreUrl}/${this.username}/auth/login`)
       .set(allowedHeaders(req.headers))
@@ -56,7 +56,7 @@ class Connection {
    * @param {express$Request} req
    * @returns {Promise<any>}
    */
-  async fetchProfile(req) {
+  async fetchProfile (req) {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/profile/private`)
       .set(allowedHeaders(req.headers))
@@ -72,7 +72,7 @@ class Connection {
    * @param {Profile | null} profile
    * @returns {Promise<void>}
    */
-  async updateProfile(reqHeaders, profile) {
+  async updateProfile (reqHeaders, profile) {
     let update = null;
     if (profile != null) {
       update = {
@@ -91,7 +91,7 @@ class Connection {
    * @param {express$Request} req
    * @returns {Promise<void>}
    */
-  async checkAccess(req) {
+  async checkAccess (req) {
     const res = await request
       .get(`${this.coreUrl}/${this.username}/access-info`)
       .set(allowedHeaders(req.headers))
@@ -110,7 +110,7 @@ module.exports = Connection;
  * @param {any} headers
  * @returns {unknown}
  */
-function allowedHeaders(headers) {
+function allowedHeaders (headers) {
   const allowed = ['origin', 'Origin', 'referer', 'Referer', 'host', 'Host'];
   const filtered = Object.keys(headers)
     .filter((key) => allowed.includes(key))

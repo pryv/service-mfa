@@ -24,7 +24,7 @@ class Session {
    * @param {Profile} profile
    * @param {PryvConnection} pryvConnection
    */
-  constructor(profile, pryvConnection) {
+  constructor (profile, pryvConnection) {
     this.id = uuidv4();
     this.profile = profile;
     this.pryvConnection = pryvConnection;

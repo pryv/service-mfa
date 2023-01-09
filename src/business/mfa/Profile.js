@@ -14,7 +14,7 @@ class Profile {
    */
   recoveryCodes = undefined;
 
-  constructor(content = {}, recoveryCodes = []) {
+  constructor (content = {}, recoveryCodes = []) {
     this.recoveryCodes = recoveryCodes;
     this.content = content;
   }
@@ -22,14 +22,14 @@ class Profile {
   /**
    * @returns {boolean}
    */
-  isActive() {
+  isActive () {
     return !_.isEmpty(this.content);
   }
 
   /**
    * @returns {void}
    */
-  generateRecoveryCodes() {
+  generateRecoveryCodes () {
     this.recoveryCodes = new Array(10).fill().map(() => {
       return uuidv4();
     });
@@ -38,7 +38,7 @@ class Profile {
   /**
    * @returns {string[]}
    */
-  getRecoveryCodes() {
+  getRecoveryCodes () {
     return this.recoveryCodes;
   }
 }

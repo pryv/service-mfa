@@ -10,9 +10,9 @@ const subdomainToPath = require('./subdomainToPath');
 const authorization = require('./authorization');
 const commonHeaders = require('./commonHeaders');
 module.exports = {
-  errors: errors,
+  errors,
   mfaSession: session,
-  subdomainToPath: subdomainToPath,
-  authorization: authorization,
-  commonHeaders: commonHeaders
+  subdomainToPath,
+  authorization,
+  commonHeaders
 };

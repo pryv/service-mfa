@@ -4,26 +4,31 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
+
 describe('POST /mfa/verify', function () {
   const username = 'testuser';
   let settings, verifyEndpoint, request;
+
   describe('mode="challenge/verify"', () => {
     const body = { code: '1234' };
+
     before(async () => {
       await app.init();
       settings = app.settings;
       verifyEndpoint = settings.get('sms:endpoints:verify:url');
       request = supertest(app.express);
     });
+
     let verifyReq, res, session;
     before(async () => {
       session = new DummySession(app, username);
-      new Mock(verifyEndpoint, '', 'POST', 200, {}, (req) => (verifyReq = req));
+      mock(verifyEndpoint, '', 'POST', 200, {}, (req) => (verifyReq = req));
       res = await request
         .post(`/${username}/mfa/verify`)
         .set('Authorization', session.mfaToken)
         .send(body);
     });
+
     it('verifies the challenge by the MFA external service', async () => {
       assert.isDefined(verifyReq);
       assert.deepEqual(
@@ -55,7 +60,7 @@ describe('POST /mfa/verify', function () {
       let res;
       before(async () => {
         const mfaToken = new DummySession(app, username).mfaToken;
-        new Mock(verifyEndpoint, '', 'POST', 404, serviceError);
+        mock(verifyEndpoint, '', 'POST', 404, serviceError);
         res = await request
           .post(`/${username}/mfa/verify`)
           .set('Authorization', mfaToken)
@@ -69,7 +74,7 @@ describe('POST /mfa/verify', function () {
   });
   describe('mode="single"', () => {
     const body = { code: '5678' };
-    let config;
+    let config, coreEndpoint, session, res;
     before(async () => {
       config = await getConfig();
       config.injectTestConfig(single.config);
@@ -84,13 +89,13 @@ describe('POST /mfa/verify', function () {
     before(async () => {
       session = new DummySession(app, username, single.profile);
       app.mfaService.setCode(username, body.code, 1000);
-      new Mock(
+      mock(
         coreEndpoint,
         '/profile/private',
         'PUT',
         200,
         {},
-        (req) => (profileReq = req)
+        (req) => (req)
       );
       res = await request
         .post(`/${username}/mfa/verify`)

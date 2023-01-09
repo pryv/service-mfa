@@ -10,7 +10,7 @@ const Application = require('../src/app');
 const assert = require('chai').assert;
 const _ = require('lodash');
 
-function compareHeaders(allHeaders, headersToFind) {
+function compareHeaders (allHeaders, headersToFind) {
   assert.deepEqual(
     _.pick(allHeaders, Object.keys(headersToFind)),
     headersToFind
@@ -20,9 +20,9 @@ function compareHeaders(allHeaders, headersToFind) {
 Object.assign(global, {
   _,
   assert,
-  Application: Application,
+  Application,
   app: new Application(),
-  Mock: require('./fixture/Mock'),
+  mock: require('./fixture/mock'),
   DummySession: require('./fixture/DummySession'),
   supertest: require('supertest'),
   getConfig,

@@ -39,6 +39,6 @@ module.exports = (req, res, next) => {
   }
   // Set authorization token in the context
   const auth = authHeader || authQuery;
-  req.context = Object.assign({}, req.context, { auth: auth });
+  req.context = Object.assign({}, req.context, { auth });
   next();
 };

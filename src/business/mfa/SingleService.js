@@ -5,7 +5,6 @@
  * Proprietary and confidential
  */
 const _ = require('lodash');
-const request = require('superagent');
 const Service = require('./Service');
 const generateCode = require('./generateCode');
 const replaceRecursively = require('../../utils/replaceRecursively');
@@ -43,7 +42,7 @@ class SingleService extends Service {
    */
   timeouts = undefined;
 
-  constructor(settings) {
+  constructor (settings) {
     super(settings);
     this.url = settings.get('sms:endpoints:single:url');
     this.apiMethod = settings.get('sms:endpoints:single:method');
@@ -65,7 +64,7 @@ class SingleService extends Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async challenge(username, profile, clientRequest) {
+  async challenge (username, profile, clientRequest) {
     const code = await generateCode(CODE_LENGTH);
     this.setCode(username, code);
     const bodyWithToken = replaceRecursively(
@@ -91,7 +90,7 @@ class SingleService extends Service {
    * @param {express$Request} clientRequest
    * @returns {Promise<void>}
    */
-  async verify(username, profile, clientRequest) {
+  async verify (username, profile, clientRequest) {
     const code = this.codes.get(username);
     if (code !== clientRequest.body.code) {
       const error = new Error(
@@ -110,7 +109,7 @@ class SingleService extends Service {
    * @param {string} code
    * @returns {void}
    */
-  setCode(username, code) {
+  setCode (username, code) {
     this.codes.set(username, code);
     this.timeouts.set(
       username,
@@ -124,7 +123,7 @@ class SingleService extends Service {
    * @param {string} username
    * @returns {void}
    */
-  clearCode(username) {
+  clearCode (username) {
     this.codes.delete(username);
     clearTimeout(this.timeouts.get(username));
   }

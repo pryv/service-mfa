@@ -4,7 +4,7 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited
  * Proprietary and confidential
  */
-/*global describe, it, before */
+
 describe('POST /mfa/activate', function () {
   let settings, coreEndpoint, challengeEndpoint, request;
   const username = 'testuser';
@@ -22,7 +22,7 @@ describe('POST /mfa/activate', function () {
     });
     let accessInfoReq, challengeReq, res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/access-info',
         'GET',
@@ -30,7 +30,7 @@ describe('POST /mfa/activate', function () {
         { token: pryvToken, type: 'personal' },
         (req) => (accessInfoReq = req)
       );
-      new Mock(
+      mock(
         challengeEndpoint,
         '',
         'POST',
@@ -45,7 +45,7 @@ describe('POST /mfa/activate', function () {
     });
     it('checks the validity of the provided Pryv token', async () => {
       assert.isDefined(accessInfoReq);
-      assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
+      assert.strictEqual(accessInfoReq.headers.authorization, pryvToken);
     });
     it('triggers the MFA challenge', async () => {
       assert.isDefined(challengeReq, 'challenge not sent');
@@ -68,7 +68,7 @@ describe('POST /mfa/activate', function () {
       };
       let res;
       before(async () => {
-        new Mock(coreEndpoint, '/access-info', 'GET', 403, pryvError);
+        mock(coreEndpoint, '/access-info', 'GET', 403, pryvError);
         res = await request
           .post(`/${username}/mfa/activate`)
           .set('Authorization', 'invalidToken')
@@ -88,11 +88,11 @@ describe('POST /mfa/activate', function () {
       };
       let res;
       before(async () => {
-        new Mock(coreEndpoint, '/access-info', 'GET', 200, {
+        mock(coreEndpoint, '/access-info', 'GET', 200, {
           token: pryvToken,
           type: 'personal'
         });
-        new Mock(challengeEndpoint, '', 'POST', 400, serviceError);
+        mock(challengeEndpoint, '', 'POST', 400, serviceError);
         res = await request
           .post(`/${username}/mfa/activate`)
           .set('Authorization', pryvToken)
@@ -122,7 +122,7 @@ describe('POST /mfa/activate', function () {
     const headers = single.config.sms.endpoints.single.headers;
     let accessInfoReq, challengeReq, res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/access-info',
         'GET',
@@ -130,7 +130,7 @@ describe('POST /mfa/activate', function () {
         { token: pryvToken, type: 'personal' },
         (req) => (accessInfoReq = req)
       );
-      new Mock(
+      mock(
         single.url,
         '',
         'POST',
@@ -148,7 +148,7 @@ describe('POST /mfa/activate', function () {
     });
     it('checks the validity of the provided Pryv token', () => {
       assert.isDefined(accessInfoReq);
-      assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
+      assert.strictEqual(accessInfoReq.headers.authorization, pryvToken);
     });
     it('forwards the information to the MFA service', () => {
       assert.isDefined(challengeReq, 'challenge request was not sent');
@@ -170,11 +170,11 @@ describe('POST /mfa/activate', function () {
       };
       let res;
       before(async () => {
-        new Mock(coreEndpoint, '/access-info', 'GET', 200, {
+        mock(coreEndpoint, '/access-info', 'GET', 200, {
           token: pryvToken,
           type: 'personal'
         });
-        new Mock(single.url, '', 'POST', 400, serviceError, null, query);
+        mock(single.url, '', 'POST', 400, serviceError, null, query);
         res = await request
           .post(`/${username}/mfa/activate`)
           .set('Authorization', pryvToken)
@@ -190,9 +190,9 @@ describe('POST /mfa/activate', function () {
     before(async () => {
       await app.init();
     });
-    let accessInfoReq, challengeReq, res;
+    let accessInfoReq, res;
     before(async () => {
-      new Mock(
+      mock(
         coreEndpoint,
         '/access-info',
         'GET',
@@ -207,7 +207,7 @@ describe('POST /mfa/activate', function () {
     });
     it('checks the validity of the provided Pryv token', () => {
       assert.isDefined(accessInfoReq);
-      assert.strictEqual(accessInfoReq.headers['authorization'], pryvToken);
+      assert.strictEqual(accessInfoReq.headers.authorization, pryvToken);
     });
     it('returns a forbidden error', () => {
       assert.equal(res.status, 403);
