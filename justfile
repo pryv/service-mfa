@@ -11,7 +11,14 @@ _help:
 
 # Set up the dev environment on a MacOS or GNU/Linux system
 setup-dev-env:
-    scripts/setup-dev-env
+    #!/usr/bin/env bash
+    set -e
+    # setup git pre-commit hook if appropriate ($CI is "true" in GitHub workflows)
+    PRE_COMMIT="scripts/pre-commit"
+    if [[ -d .git && "$CI" != "true" ]]; then
+        cp $PRE_COMMIT .git/hooks/
+        echo "✓ Git pre-commit hook setup from '$PRE_COMMIT'"
+    fi
 
 # Install node modules afresh
 install *params: clean
