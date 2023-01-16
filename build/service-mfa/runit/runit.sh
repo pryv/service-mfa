@@ -3,7 +3,7 @@
 set -e
 
 export NODE_ENV=production
-export NODE_PATH=/app/bin/
+export NODE_PATH=/app/bin/src/
 
 create_links() {
 	remove_links # Remove all existing service, if any
