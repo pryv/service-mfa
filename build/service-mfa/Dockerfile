@@ -26,7 +26,7 @@ RUN mkdir -p $LOG_DIR && \
 
 # ============================ start runit ================================
 # Install the script that runs the api service
-RUN mkdir /etc/runit/ && mkdir /etc/service/runit/
+RUN mkdir -p /etc/runit/ && mkdir -p /etc/service/runit/
 RUN cp -r $TARGET_DIR/build/$COMPONENT_NAME/runit/* /etc/runit/
 RUN mv /etc/runit/runit.sh /etc/init.d/
 
