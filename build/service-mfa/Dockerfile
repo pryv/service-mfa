@@ -1,4 +1,4 @@
-FROM pryvio/base:1.3.40
+FROM eu.gcr.io/pryvio/base:1.8.1
 MAINTAINER "Tech@Pryv" <tech@pryv.com>
 
 ARG TARGET_DIR="/app/bin"
