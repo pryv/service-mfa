@@ -33,7 +33,7 @@ Here is a documented default configuration for this service:
     ip: '127.0.0.1',
   },
   logs: {
-    prefix: 'service-mfa',
+    prefix: 'mfa',
     console: {
       active: true,
       level: 'info',

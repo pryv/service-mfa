@@ -6,7 +6,7 @@
  */
 const path = require('path');
 const { getConfig } = require('@pryv/boiler').init({
-  appName: 'service-mfa',
+  appName: 'mfa-server',
   baseConfigDir: path.resolve(__dirname, '../config/'),
   extraConfigs: [
     {

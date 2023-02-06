@@ -3,7 +3,7 @@ http:
   port: 7000
   ip: 127.0.0.1
 logs:
-  prefix: service-mfa
+  prefix: mfa
   console:
     active: true
     level: info
@@ -23,21 +23,21 @@ core:
 sms:
   mode: 'challenge-verify'  # allowed: 'challenge-verify', 'single'
   endpoints:
-    challenge: 
+    challenge:
       url: 'https://api.smsapi.com/mfa/codes'
       method: 'POST'
       body: '{"phone_number":"{{ phone_number }}"}'
       headers:
         authorization: 'Bearer TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
         'content-type': 'application/json'
-    verify: 
+    verify:
       url: 'https://api.smsapi.com/mfa/codes/verifications'
       method: 'POST'
       body: '{"phone_number":"{{ phone_number }}","code":"{{ code }}"}'
       headers:
         authorization: 'Bearer TUewFvPRTcPI8m8w3t2Ivu70MXN3DrkuOXA2eAbB'
         'content-type': 'application/json'
-    single: 
+    single:
       url: https://api.smsmode.com/http/1.6/sendSMS.do?accessToken=MpBJUQtZPkbWwZ76avvobN1wFdv4K7ls&message={{ code }}&emetteur=Pryv%20Lab&numero={{ phone_number }}
       method: 'GET'
 sessions:
