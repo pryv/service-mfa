@@ -1,6 +1,6 @@
 {
   "name": "service-mfa",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "private": true,
   "description": "A service for adding two factor authentication on top of Pryv.io login calls.",
   "homepage": "https://pryv.com",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "eslint": "^8.31.0",
+    "eslint": "^8.33.0",
     "eslint-config-semistandard": "^17.0.0",
     "mocha": "^10.2.0",
     "nock": "^10.0.6",
