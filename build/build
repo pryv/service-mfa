@@ -2,7 +2,7 @@
 
 set -e
 
-# Builds 'service-mfa' docker image with the version given below. 
+# Builds 'mfa' docker image with the version given below.
 
 # Determine the build_tag and whether we need to release.
 SCRIPT_FOLDER=$(cd $(dirname "$0"); pwd)
@@ -16,6 +16,6 @@ fi
 host='eu.gcr.io'
 
 echo "---------------------------- building mfa --------------------------------"
-echo $host/pryvio/service-mfa:$version
-docker build --build-arg COMPONENT_NAME=service-mfa -f $SCRIPT_FOLDER/service-mfa/Dockerfile -t $host/pryvio/service-mfa:$version .
-docker push $host/pryvio/service-mfa:$version
+echo $host/pryvio/mfa:$version
+docker build --build-arg COMPONENT_NAME=mfa -f $SCRIPT_FOLDER/mfa/Dockerfile -t $host/pryvio/mfa:$version .
+docker push $host/pryvio/mfa:$version

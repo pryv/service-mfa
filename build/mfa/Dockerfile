@@ -44,6 +44,6 @@ RUN apt-get autoremove && apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* & rm -rf /app/bin/build
 
 # Ports:
-#   9000        service-mfa API
+#   9000        MFA API
 #
 EXPOSE 9000

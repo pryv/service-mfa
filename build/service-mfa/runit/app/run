@@ -1,2 +1,0 @@
-#!/bin/sh
-exec chpst -u app node /app/bin/src/server.js --config /app/conf/service-mfa.yml
