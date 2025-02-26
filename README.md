@@ -129,6 +129,11 @@ Verify the MFA challenge.
 `Response`:
   - 200 {token: 'pryvPersonalToken'}
 
+## Contributing
+
+### Todo 
+- update docker pryvio/base1.8.1 to base1.9.0 (or latest)
+- realease github workflow has been archived in `archives` it needs to rewritten to publish on dockerHub
 
 ## License
 
