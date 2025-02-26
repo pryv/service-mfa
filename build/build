@@ -13,7 +13,9 @@ if [ -e release_build ]; then
   echo "This is a release build, it will update 'latest' tags."
 fi
 
-host='eu.gcr.io'
+version
+
+host='docker.io'
 
 echo "---------------------------- building mfa --------------------------------"
 echo $host/pryvio/mfa:$version
