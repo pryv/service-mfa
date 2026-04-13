@@ -1,25 +1,18 @@
 # service-mfa
 
-> **ARCHIVED — 2026-04-07.**
+> **ARCHIVED** — This standalone service has been merged into [**open-pryv.io**](https://github.com/pryv/open-pryv.io).
+> All development continues there. This repo is kept as read-only reference.
 >
-> This standalone service has been merged into **service-core** as part of
-> **Plan 26**. MFA is now a native feature of service-core with canonical
+> MFA is now a native feature of open-pryv.io v2 with canonical
 > `mfa.*` API methods (`mfa.activate`, `mfa.confirm`, `mfa.challenge`,
-> `mfa.verify`, `mfa.deactivate`, `mfa.recover`) — the Pryv JS SDK already
-> speaks these.
+> `mfa.verify`, `mfa.deactivate`, `mfa.recover`).
 >
-> - **Merge commit** (service-core `refactor/pre-v2`): [`aa9abcee`](https://github.com/pryv/service-core/commit/aa9abcee)
-> - **Business logic**: `service-core/components/business/src/mfa/`
-> - **API methods**: `service-core/components/api-server/src/methods/mfa.js`
-> - **HTTP routes**: `service-core/components/api-server/src/routes/mfa.js`
-> - **Config schema**: new `services.mfa` block in `service-core/config/default-config.yml`
+> - **Business logic**: `components/business/src/mfa/`
+> - **API methods**: `components/api-server/src/methods/mfa.js`
+> - **HTTP routes**: `components/api-server/src/routes/mfa.js`
+> - **Config schema**: `services.mfa` block in `config/default-config.yml`
 >   (default `mode: disabled` — fully backwards-compatible)
-> - **Acceptance tests**: `service-core/components/api-server/test/mfa-seq.test.js`
-> - **CHANGELOG entries**: see `service-core/CHANGELOG-v2.md` and
->   `CHANGELOG-v2-back.md` under "Plan 26".
->
-> No further work will happen on this repository. If you need to understand
-> the historical design, read this file and then follow the pointers above.
+> - **Acceptance tests**: `components/api-server/test/mfa-seq.test.js`
 
 ---
 
